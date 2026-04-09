@@ -264,36 +264,6 @@
     .school-metric-grid { grid-template-columns: 1fr 1fr; }
   }
 
-  /* ── CORRELATIONS TAB ── */
-  .corr-school-toggle { display:flex; background:var(--bg3); border:1px solid var(--border); border-radius:12px; overflow:hidden; width:fit-content; margin-bottom:28px; }
-  .corr-school-btn { padding:9px 22px; font-size:13px; font-weight:600; color:var(--text2); cursor:pointer; border:none; background:none; transition:all 0.2s; white-space:nowrap; }
-  .corr-school-btn:hover { color:var(--text); }
-  .corr-school-btn.active { background:var(--card2); color:var(--text); }
-  .corr-school-btn.heb.active { color:var(--accent2); }
-  .corr-school-btn.bib.active { color:var(--green2); }
-
-  .r2-badges { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:28px; }
-  .r2-badge { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 24px; text-align:center; min-width:120px; transition:border-color 0.2s; }
-  .r2-badge:hover { border-color:var(--border2); }
-  .r2-badge-val { font-size:26px; font-weight:800; letter-spacing:-0.8px; margin-bottom:5px; line-height:1; }
-  .r2-badge-lbl { font-size:11px; color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
-
-  .seg-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .seg-table th { padding:10px 14px; font-size:11px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; background:var(--bg3); border-bottom:1px solid var(--border); white-space:nowrap; text-align:left; }
-  .seg-table td { padding:11px 14px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
-  .seg-table tr:last-child td { border-bottom:none; }
-  .seg-table tr:hover td { background:rgba(255,255,255,0.02); }
-  .ratio-badge { display:inline-flex; padding:3px 9px; border-radius:7px; font-size:12px; font-weight:700; }
-  .ratio-up   { background:rgba(16,185,129,0.12); color:var(--green2); }
-  .ratio-down { background:rgba(239,68,68,0.10); color:#fca5a5; }
-  .ratio-neu  { background:rgba(245,158,11,0.10); color:var(--amber2); }
-
-  .corr-insight-item { display:flex; gap:13px; padding:12px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
-  .corr-insight-item:last-child { border-bottom:none; }
-  .corr-insight-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
-  .corr-insight-text { font-size:13px; color:var(--text2); line-height:1.6; }
-  .corr-insight-text strong { color:var(--text); }
-
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 3px; }
@@ -335,7 +305,6 @@
     <div class="main-tab" onclick="switchPage('biblical',this)">Biblical School</div>
     <div class="main-tab" onclick="switchPage('campaigns',this)">Campaign Explorer</div>
     <div class="main-tab" onclick="switchPage('analysis',this)">Analysis &amp; Insights</div>
-    <div class="main-tab" onclick="switchPage('corr',this)">Correlations &amp; R²</div>
   </div>
 </nav>
 
@@ -517,97 +486,6 @@
 </div>
 </div>
 
-<!-- ══════════ CORRELATIONS ══════════ -->
-<div class="page" id="page-corr">
-<div class="content">
-  <div class="section-header">
-    <div class="school-badge all"><div class="school-dot" style="background:#a855f7"></div>Predictive Intelligence</div>
-    <div class="section-title">Correlations &amp; R² — What Really Drives Revenue?</div>
-    <div class="section-sub">Independent business features only · Circular variables (Orders, Acquisitions) excluded · OLS regression + permutation importance</div>
-  </div>
-
-  <div class="corr-school-toggle" id="corrSchoolToggle">
-    <button class="corr-school-btn active" onclick="setCorrSchool('all',this)">All Schools</button>
-    <button class="corr-school-btn heb" onclick="setCorrSchool('hebrew',this)">Hebrew School</button>
-    <button class="corr-school-btn bib" onclick="setCorrSchool('biblical',this)">Biblical School</button>
-  </div>
-
-  <div class="r2-badges" id="r2Badges"></div>
-
-  <div class="chart-grid chart-grid-2" style="margin-bottom:24px">
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div>
-          <div class="chart-card-title">Correlation with Revenue</div>
-          <div class="chart-card-sub">Pearson r · Independent features only · Sorted by strength</div>
-        </div>
-      </div>
-      <div class="chart-wrap" style="height:360px"><canvas id="corrBarChart"></canvas></div>
-      <div class="legend" style="margin-top:14px">
-        <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Positive effect on revenue</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Negative effect on revenue</div>
-      </div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div>
-          <div class="chart-card-title">Feature Importance</div>
-          <div class="chart-card-sub">Permutation importance in OLS model · % contribution · Color = direction</div>
-        </div>
-      </div>
-      <div class="chart-wrap" style="height:360px"><canvas id="featImpChart"></canvas></div>
-      <div class="legend" style="margin-top:14px">
-        <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Acts positively</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Acts negatively</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="chart-card" style="margin-bottom:24px">
-    <div class="chart-card-header">
-      <div>
-        <div class="chart-card-title">Top 20% Revenue Days vs. Bottom 80% — Independent Feature Comparison</div>
-        <div class="chart-card-sub">Pareto-based segmentation · What makes elite days different from ordinary days</div>
-      </div>
-    </div>
-    <div class="table-scroll"><table class="seg-table" id="segTable"></table></div>
-  </div>
-
-  <div class="chart-grid chart-grid-2" style="margin-bottom:24px">
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div>
-          <div class="chart-card-title">Cost per Lead vs. ROI</div>
-          <div class="chart-card-sub">Bubble size = daily lead volume · Color = contact rate (green = high)</div>
-        </div>
-      </div>
-      <div class="chart-wrap" style="height:300px"><canvas id="cplRoiScatter"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <div>
-          <div class="chart-card-title">Business Interpretation</div>
-          <div class="chart-card-sub">Actionable insights derived from the model</div>
-        </div>
-      </div>
-      <div id="corrInsights" style="padding-top:4px"></div>
-    </div>
-  </div>
-
-  <div class="analysis-card" style="margin-bottom:0;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.15);border-radius:20px;padding:28px">
-    <div class="analysis-h" style="font-size:13px;color:var(--text2);font-weight:500"><div class="analysis-icon icon-insight" style="font-size:12px">📋</div>Methodology Note — Correlations &amp; R²</div>
-    <div style="font-size:12.5px;color:var(--text2);line-height:1.75">
-      <strong style="color:var(--text)">Features used</strong>: CPL, CPM, Contact Rate, Call Rate, Impressions/Lead, Daily Lead Volume, Budget Deployed, Google Lead Share, Facebook Lead Share, Google Spend Share, Day of Week, Month, Is Weekend ·
-      <strong style="color:var(--text)">Excluded</strong>: Orders, Acquisitions, Revenue (circular) ·
-      <strong style="color:var(--text)">Model</strong>: OLS regression with log-transformed Revenue (target) ·
-      <strong style="color:var(--text)">Importance</strong>: Permutation importance (feature shuffle method) ·
-      <strong style="color:var(--text)">CV-R²</strong>: 5-fold cross-validated R² (out-of-sample generalisation) ·
-      <strong style="color:var(--text)">Segment</strong>: Top 20% = days in top quintile of revenue; Bottom 80% = all other days
-    </div>
-  </div>
-</div>
-</div>
-
 <div class="watermark">Campaign Intelligence Dashboard</div>
 
 <script>
@@ -615,19 +493,9 @@
 //  DATA & GLOBALS
 // ══════════════════════════════════════════
 let DATA = null;
-let INDEP = null;
 let charts = {};
 let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
 let campSchool = 'all';
-let corrSchool = 'all';
-
-const FEAT_LABELS = {
-  CPL:'Cost per Lead', CPM:'Cost per Mille', Contact_Rate:'Contact Rate',
-  Call_Rate:'Call Rate', Impr_per_Lead:'Impressions / Lead', Lead_Volume:'Daily Lead Volume',
-  Budget_Deployed:'Budget Deployed', Google_Lead_Share:'Google Lead Share',
-  FB_Lead_Share:'Facebook Lead Share', Google_Spend_Share:'Google Spend Share',
-  DayOfWeek:'Day of Week', Month:'Month (avg)', IsWeekend:'Is Weekend',
-};
 
 const fmt = {
   $:   v => '$' + (v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(1)+'K' : Number(v).toFixed(0)),
@@ -723,16 +591,14 @@ function setCampSchool(school, btn) {
 //  BOOT
 // ══════════════════════════════════════════
 async function boot() {
-  const [res1, res2] = await Promise.all([fetch('./data.json'), fetch('./indep_data.json')]);
-  DATA  = await res1.json();
-  INDEP = await res2.json();
+  const res = await fetch('./data.json');
+  DATA = await res.json();
   document.getElementById('dateRange').textContent = DATA.summary_v2.dateRange;
   buildOverview();
   buildHebrew();
   buildBiblical();
   buildTable('allTable', DATA.topCampaigns_v2.all.byRevenue);
   buildAnalysis();
-  buildCorr();
 }
 
 // ══════════════════════════════════════════
@@ -1161,232 +1027,6 @@ function buildAnalysis() {
       </div>
     </div>
   `;
-}
-
-// ══════════════════════════════════════════
-//  CORRELATIONS & R² TAB
-// ══════════════════════════════════════════
-function setCorrSchool(school, btn) {
-  corrSchool = school;
-  document.getElementById('corrSchoolToggle').querySelectorAll('.corr-school-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  buildCorr();
-}
-
-function buildCorr() {
-  if (!INDEP) return;
-  const d = INDEP.independent_analysis[corrSchool];
-
-  // ─ R² badges
-  const r2c  = d.r2     >= 0.32 ? 'var(--green2)' : d.r2     >= 0.20 ? 'var(--amber2)' : 'var(--red)';
-  const cvc  = d.cv_r2  >= 0.20 ? 'var(--green2)' : d.cv_r2  >= 0.10 ? 'var(--amber2)' : 'var(--red)';
-  const gen  = d.cv_r2 >= 0.22 ? '✓ Robust' : d.cv_r2 >= 0.10 ? '~ Moderate' : '⚠ Exploratory';
-  const genC = d.cv_r2 >= 0.22 ? 'var(--green2)' : d.cv_r2 >= 0.10 ? 'var(--amber2)' : 'var(--red)';
-  document.getElementById('r2Badges').innerHTML = `
-    <div class="r2-badge"><div class="r2-badge-val" style="color:var(--text2)">${d.n_days.toLocaleString()}</div><div class="r2-badge-lbl">Days Analysed</div></div>
-    <div class="r2-badge"><div class="r2-badge-val" style="color:${r2c}">${(d.r2*100).toFixed(1)}%</div><div class="r2-badge-lbl">R² In-Sample</div></div>
-    <div class="r2-badge"><div class="r2-badge-val" style="color:${r2c}">${(d.r2_adj*100).toFixed(1)}%</div><div class="r2-badge-lbl">Adj-R²</div></div>
-    <div class="r2-badge"><div class="r2-badge-val" style="color:${cvc}">${(d.cv_r2*100).toFixed(1)}%</div><div class="r2-badge-lbl">CV-R² Out-of-Sample</div></div>
-    <div class="r2-badge" style="background:rgba(99,102,241,0.06);border-color:rgba(99,102,241,0.2)"><div class="r2-badge-val" style="color:${genC};font-size:15px">${gen}</div><div class="r2-badge-lbl">Generalisability</div></div>
-  `;
-
-  buildCorrBarChart(d);
-  buildFeatImpChart(d);
-  buildSegTable(d);
-  buildCplRoiScatter(d);
-  buildCorrInsights();
-}
-
-function buildCorrBarChart(d) {
-  dc('corrBar');
-  const corrs = Object.entries(d.corr_revenue)
-    .sort((a,b) => Math.abs(b[1]) - Math.abs(a[1]));
-  const labels = corrs.map(([k]) => FEAT_LABELS[k] || k);
-  const values = corrs.map(([,v]) => v);
-  const bgCols  = values.map(v => v >= 0 ? 'rgba(99,102,241,0.70)' : 'rgba(239,68,68,0.65)');
-  const brdCols = values.map(v => v >= 0 ? '#6366f1' : '#ef4444');
-  const ctx = document.getElementById('corrBarChart').getContext('2d');
-  charts['corrBar'] = new Chart(ctx, {
-    type:'bar',
-    data:{ labels, datasets:[{ data:values, backgroundColor:bgCols, borderColor:brdCols, borderWidth:1.5, borderRadius:6, borderSkipped:false }] },
-    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false},
-        tooltip:{ ...TT, callbacks:{ label:c=>` r = ${c.parsed.x >= 0 ? '+' : ''}${c.parsed.x.toFixed(3)}  (${c.parsed.x > 0.1 ? 'positive ↑' : c.parsed.x < -0.1 ? 'negative ↓' : 'weak'})` }} },
-      scales:{
-        x:{ grid:{color:gc}, ticks:{color:'#666688',callback:v=>v.toFixed(2)}, min:-0.7, max:0.7 },
-        y:{ grid:{display:false}, ticks:{color:'#9999b0',font:{size:11}} }
-      }
-    }
-  });
-}
-
-function buildFeatImpChart(d) {
-  dc('featImp');
-  const imps = Object.entries(d.feature_importance).sort((a,b) => b[1]-a[1]);
-  const labels = imps.map(([k]) => FEAT_LABELS[k] || k);
-  const values = imps.map(([,v]) => v);
-  const dirs   = imps.map(([k]) => d.feature_direction[k] || '+');
-  const bgCols  = dirs.map(dir => dir === '+' ? 'rgba(99,102,241,0.70)' : 'rgba(239,68,68,0.65)');
-  const brdCols = dirs.map(dir => dir === '+' ? '#6366f1' : '#ef4444');
-  const ctx = document.getElementById('featImpChart').getContext('2d');
-  charts['featImp'] = new Chart(ctx, {
-    type:'bar',
-    data:{ labels, datasets:[{ data:values, backgroundColor:bgCols, borderColor:brdCols, borderWidth:1.5, borderRadius:6, borderSkipped:false }] },
-    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false},
-        tooltip:{ ...TT, callbacks:{ label:c=>{ const dir=dirs[c.dataIndex]; return ` ${c.parsed.x.toFixed(1)}% importance · direction: ${dir==='+'?'positive ↑':'negative ↓'}`; }}} },
-      scales:{
-        x:{ grid:{color:gc}, ticks:{color:'#666688',callback:v=>v.toFixed(0)+'%'} },
-        y:{ grid:{display:false}, ticks:{color:'#9999b0',font:{size:11}} }
-      }
-    }
-  });
-}
-
-function buildSegTable(d) {
-  const seg = d.segment_comparison;
-  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const MONTHS = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  // Features ordered by business relevance
-  const ORDER = ['IsWeekend','DayOfWeek','Month','Contact_Rate','Call_Rate','Budget_Deployed','CPL','CPM','Impr_per_Lead','Lead_Volume','FB_Lead_Share','Google_Spend_Share','Google_Lead_Share'];
-  // For these features lower is better on top-20% days
-  const REVERSE_GOOD = new Set(['CPL','CPM','Impr_per_Lead','FB_Lead_Share','IsWeekend','DayOfWeek']);
-
-  const fmtSeg = (k, v) => {
-    if (v == null) return 'N/A';
-    if (k === 'IsWeekend')        return (v*100).toFixed(0)+'% wknds';
-    if (k === 'DayOfWeek')        return DAYS[Math.round(v)] + ' (avg '+v.toFixed(1)+')';
-    if (k === 'Month')            return MONTHS[Math.round(v)] + ' (avg '+v.toFixed(1)+')';
-    if (k === 'Contact_Rate')     return (v*100).toFixed(1)+'%';
-    if (k === 'Google_Lead_Share')return (v*100).toFixed(1)+'%';
-    if (k === 'FB_Lead_Share')    return (v*100).toFixed(1)+'%';
-    if (k === 'Google_Spend_Share')return (v*100).toFixed(1)+'%';
-    if (k === 'Call_Rate')        return v.toFixed(1)+'%';
-    if (k === 'CPL' || k === 'CPM' || k === 'Budget_Deployed') return '$'+v.toFixed(0);
-    if (k === 'Impr_per_Lead')    return Number(v.toFixed(0)).toLocaleString();
-    if (k === 'Lead_Volume')      return Number(v.toFixed(0)).toLocaleString();
-    return v.toFixed(2);
-  };
-
-  const ratioBadge = (ratio, reverseGood) => {
-    const pct = ((ratio-1)*100).toFixed(0);
-    const sign = ratio > 1 ? '+' : '';
-    let cls;
-    if (reverseGood) cls = ratio < 0.97 ? 'ratio-up' : ratio > 1.03 ? 'ratio-down' : 'ratio-neu';
-    else             cls = ratio > 1.03 ? 'ratio-up' : ratio < 0.97 ? 'ratio-down' : 'ratio-neu';
-    return `<span class="ratio-badge ${cls}">${sign}${pct}%</span>`;
-  };
-
-  const INTERP = {
-    IsWeekend:         'Weekdays dominate top days — weekend spend is the primary ROI drag',
-    DayOfWeek:         'Best days skew Mon–Wed; later in week is worse for revenue',
-    Month:             'Mid-to-late year (Aug–Nov) clusters highest revenue days — strong seasonality',
-    Contact_Rate:      'Higher sales-team contact rate on peak days drives more conversions per lead',
-    Call_Rate:         'More audience callbacks on best days — engaged prospects are closer to buying',
-    Budget_Deployed:   'Best days deploy more budget; scale tested creatives on Tue–Thu peak windows',
-    CPL:               'Lower cost-per-lead on top days = tighter audience targeting, better ROI',
-    CPM:               'CPM is similar across segments — not the primary differentiator',
-    Impr_per_Lead:     'Fewer impressions needed per lead on top days — ads resonate, reduce wasted reach',
-    Lead_Volume:       'Higher daily lead count amplifies revenue opportunity when quality is maintained',
-    FB_Lead_Share:     'Best days rely ~10% less on Facebook leads — Google traffic is higher quality',
-    Google_Spend_Share:'Slightly more Google budget share on top days — shift budget mid-week',
-    Google_Lead_Share: 'Google lead share marginally different — monitor by creative type',
-  };
-
-  const rows = ORDER.filter(k => seg[k]).map(k => {
-    const s = seg[k];
-    const isRev = REVERSE_GOOD.has(k);
-    return `<tr>
-      <td style="font-weight:600;color:var(--text);white-space:nowrap">${FEAT_LABELS[k]||k}</td>
-      <td style="color:var(--green2);font-weight:700;white-space:nowrap">${fmtSeg(k,s.top20_mean)}</td>
-      <td style="color:var(--text2);white-space:nowrap">${fmtSeg(k,s.bot80_mean)}</td>
-      <td style="white-space:nowrap">${ratioBadge(s.ratio,isRev)}</td>
-      <td style="font-size:12px;color:var(--text2);line-height:1.5;min-width:280px">${INTERP[k]||''}</td>
-    </tr>`;
-  }).join('');
-
-  document.getElementById('segTable').innerHTML = `
-    <thead><tr>
-      <th>Feature</th>
-      <th style="color:var(--green2)">Top 20% Days</th>
-      <th>Bottom 80% Days</th>
-      <th>Delta</th>
-      <th>Business Interpretation</th>
-    </tr></thead>
-    <tbody>${rows}</tbody>`;
-}
-
-function buildCplRoiScatter(d) {
-  dc('cplRoi');
-  const pts = d.scatter_cpl_roi;
-  if (!pts || !pts.length) return;
-  const maxC = Math.max(...pts.map(p => p.Contact_Rate || 0));
-  const data  = pts.map(p => ({
-    x: p.CPL,
-    y: p.ROI,
-    r: Math.max(4, Math.min(22, (p.Lead_Volume||30)/14)),
-    leads:   p.Lead_Volume,
-    contact: p.Contact_Rate,
-    budget:  p.Budget_Deployed,
-  }));
-  const colors = pts.map(p => {
-    const t = Math.min(1, (p.Contact_Rate||0) / (maxC * 0.8));
-    if (t > 0.60) return 'rgba(16,185,129,0.65)';
-    if (t > 0.30) return 'rgba(99,102,241,0.65)';
-    return 'rgba(239,68,68,0.60)';
-  });
-  const ctx = document.getElementById('cplRoiScatter').getContext('2d');
-  charts['cplRoi'] = new Chart(ctx, {
-    type:'bubble',
-    data:{ datasets:[{ data, backgroundColor:colors, borderColor:'transparent', borderWidth:0 }] },
-    options:{ responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false},
-        tooltip:{ ...TT, callbacks:{ label:c => {
-          const p = c.raw;
-          return [
-            ` CPL: $${p.x.toFixed(2)}`,
-            ` ROI: ${p.y.toFixed(2)}x`,
-            ` Daily Leads: ${(p.leads||0).toFixed(0)}`,
-            ` Contact Rate: ${((p.contact||0)*100).toFixed(1)}%`,
-            ` Budget: $${(p.budget||0).toFixed(0)}`
-          ];
-        }}} },
-      scales:{
-        x:{ grid:{color:gc}, ticks:{color:'#666688',callback:v=>'$'+v.toFixed(0)}, title:{display:true,text:'Cost per Lead ($)',color:'#666688'} },
-        y:{ grid:{color:gc}, ticks:{color:'#666688',callback:v=>v.toFixed(1)+'x'}, title:{display:true,text:'ROI',color:'#666688'} }
-      }
-    }
-  });
-}
-
-function buildCorrInsights() {
-  const insights = {
-    all: [
-      { icon:'📅', text:'<strong>Avoid weekends ruthlessly</strong> — IsWeekend has a <strong>−0.54 correlation</strong> with revenue and is the #2 model feature. Weekend days generate ~67% less revenue than weekdays. Reallocating weekend budget to Mon–Wed could improve portfolio ROI by an estimated <strong>8–12%</strong>.' },
-      { icon:'📞', text:'<strong>Contact Rate + Call Rate are controllable levers</strong> — r = +0.29 and +0.32 respectively. These are <em>sales operations</em> variables, not media variables. Top-20% days show 8.5% higher contact and 13.9% higher call rate. Invest in CRM speed-to-lead and sales team capacity.' },
-      { icon:'💰', text:'<strong>Budget Deployed is the #1 importance feature (19.4%)</strong> but with diminishing returns. CV-R² at 22.7% shows real but limited predictability. Optimal daily budget on top days is ~$9,400 vs ~$8,500 on ordinary days — a 10.7% difference, not a 2x lift.' },
-      { icon:'🎯', text:'<strong>Lower CPL = better targeting quality</strong> — Best days achieve CPL of $31.26 vs $32.23 on ordinary days. Campaigns generating leads at $28–32 consistently outperform high-CPL days. Tighten audience segmentation on Google/Facebook to suppress CPL above $35.' },
-      { icon:'📱', text:'<strong>Facebook is a headwind</strong> — Facebook Lead Share has r = −0.25. Top-20% days carry 10.1% lower Facebook lead dependency. Google traffic is demonstrably higher quality — increase Google Spend Share from 27% (bottom days) toward 29% (top days) as an initial lever.' },
-    ],
-    hebrew: [
-      { icon:'💼', text:'<strong>Budget is the primary lever for Hebrew (26.5% importance)</strong> — Hebrew audiences respond proportionally to spend. Top 20% Hebrew days deploy 20.2% more budget ($4,130 vs $3,435). Scaling tested Hebrew Google campaigns is the clearest path to revenue growth.' },
-      { icon:'📞', text:'<strong>Contact Rate is critical for Hebrew conversions (14.8%)</strong> — Hebrew leads need proactive outreach. Top Hebrew days show 9.4% higher contact rate (60% vs 55%). Implement a ≤30-minute lead response SLA on weekday mornings to capture this upside.' },
-      { icon:'💲', text:'<strong>CPL directly hurts Hebrew ROI (10.5% importance, negative direction)</strong> — Best Hebrew days run CPL of $48.54 vs $53.32 on ordinary days (−9%). Target CPL reduction to below $46 through tighter Google ad group structure and audience exclusion lists.' },
-      { icon:'📅', text:'<strong>Early-week timing matters for Hebrew</strong> — DayOfWeek has r = −0.35; best Hebrew days cluster around Wed (avg 2.24) vs Thu on ordinary days (avg 3.18). Schedule Hebrew campaign launches and bid boosts for Mon–Wed mornings.' },
-      { icon:'📊', text:'<strong>R² = 32.3% / CV-R² = 25.7%</strong> — Hebrew has the best out-of-sample fit. The model generalises well for Hebrew: identified features (budget, contact rate, CPL, timing) are genuinely predictive — act on them with confidence.' },
-    ],
-    biblical: [
-      { icon:'📅', text:'<strong>Biblical is most weekend-sensitive in the portfolio (27.6% importance)</strong> — IsWeekend is the #1 driver for Biblical. Best Biblical days have only 4.8% weekend days vs 34.3% on ordinary days (∨6% lower). Weekend Biblical spend is the single largest ROI leak to fix.' },
-      { icon:'🗓', text:'<strong>Strong seasonal signal (Month = 13.6% importance)</strong> — Biblical revenue skews toward mid-to-late year: best days average Month 7.0 (July) vs 5.75 (June) on ordinary days. Increase Biblical budgets 25–40% in Q3–Q4 and trim aggressively in Q1.' },
-      { icon:'📞', text:'<strong>Contact Rate drives Biblical conversions (12.5%, r = +0.23)</strong> — Biblical buyers have longer decision cycles and require multiple touches. Best days show 8.5% higher contact rate. Invest in automated follow-up sequences and multi-day outreach cadences.' },
-      { icon:'📱', text:'<strong>Facebook overweight suppresses Biblical ROI</strong> — Best Biblical days have 8.8% lower Facebook lead share (43.3% vs 47.5%). Facebook is the high-volume but low-quality channel for Biblical. Test reallocating 15% of Biblical Facebook budget to Google.' },
-      { icon:'⚠️', text:'<strong>CV-R² = 10.0%</strong> — Biblical revenue has the lowest out-of-sample predictability. Significant unexplained variance likely comes from creative quality, email nurture sequences, or offer/pricing changes not captured in daily media data. Treat Biblical findings as directional, not prescriptive.' },
-    ],
-  };
-  const list = (insights[corrSchool]||insights.all).map(ins =>
-    `<div class="corr-insight-item"><div class="corr-insight-icon">${ins.icon}</div><div class="corr-insight-text">${ins.text}</div></div>`
-  ).join('');
-  document.getElementById('corrInsights').innerHTML = list;
 }
 
 boot();
