@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Intelligence Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #111118;
+    --bg3: #18181f;
+    --card: #1c1c25;
+    --card2: #22222d;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f0f5;
+    --text2: #9999b0;
+    --text3: #6666808;
+    --accent: #6366f1;
+    --accent2: #818cf8;
+    --green: #10b981;
+    --green2: #34d399;
+    --amber: #f59e0b;
+    --amber2: #fbbf24;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --blue2: #60a5fa;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --cyan: #06b6d4;
+    --heb-color: #6366f1;
+    --bib-color: #10b981;
+    --heb-glow: rgba(99,102,241,0.15);
+    --bib-glow: rgba(16,185,129,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ========== HEADER ========== */
+  .header {
+    background: linear-gradient(135deg, #0d0d17 0%, #111128 50%, #0d1a1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 20px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 9px;
+    display: flex;align-items:center;justify-content:center;
+    font-size: 16px;
+    box-shadow: 0 0 20px rgba(99,102,241,0.4);
+  }
+  .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .status-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--green2);
+    font-weight: 500;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--green2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ========== MAIN NAV TABS ========== */
+  .main-nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    position: sticky;
+    top: 64px;
+    z-index: 99;
+  }
+  .main-nav-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+  }
+  .main-tab {
+    padding: 14px 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .main-tab:hover { color: var(--text); }
+  .main-tab.active { color: var(--text); border-bottom-color: var(--accent2); }
+
+  /* ========== PAGE CONTENT ========== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 36px 40px 80px;
+  }
+
+  /* ========== SECTION HEADER ========== */
+  .section-header {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .school-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .school-badge.heb {
+    background: var(--heb-glow);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: var(--accent2);
+  }
+  .school-badge.bib {
+    background: var(--bib-glow);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: var(--green2);
+  }
+  .school-badge.all {
+    background: rgba(168,85,247,0.1);
+    border: 1px solid rgba(168,85,247,0.3);
+    color: #c084fc;
+  }
+  .school-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .school-dot.heb { background: var(--heb-color); }
+  .school-dot.bib { background: var(--bib-color); }
+
+  /* ========== KPI CARDS ========== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border2);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 16px 16px 0 0;
+  }
+  .kpi-card.accent::before { background: linear-gradient(90deg, var(--accent), var(--purple)); }
+  .kpi-card.green::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+  .kpi-card.amber::before { background: linear-gradient(90deg, var(--amber), var(--pink)); }
+  .kpi-card.blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+  .kpi-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+  .kpi-card.red::before { background: linear-gradient(90deg, var(--red), var(--amber)); }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+  .kpi-delta.up { background: rgba(16,185,129,0.12); color: var(--green2); }
+  .kpi-delta.neutral { background: rgba(99,102,241,0.12); color: var(--accent2); }
+
+  /* ========== CHART CARDS ========== */
+  .chart-grid {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .chart-grid-2 { grid-template-columns: 1fr 1fr; }
+  .chart-grid-3 { grid-template-columns: 2fr 1fr; }
+  .chart-grid-full { grid-template-columns: 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+  .chart-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .chart-card-sub {
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .chart-toggle {
+    display: flex;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .chart-toggle-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all 0.15s;
+  }
+  .chart-toggle-btn.active {
+    background: var(--card2);
+    color: var(--text);
+  }
+  .chart-wrap {
+    position: relative;
+  }
+  .chart-wrap canvas { width: 100% !important; }
+
+  /* ========== LEGEND ========== */
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ========== DATA TABLE ========== */
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .table-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .table-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .tab-group {
+    display: flex;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .tab-btn {
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: var(--card2);
+    color: var(--text);
+  }
+  .table-scroll {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-arrow { opacity: 0.4; margin-left: 4px; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody td {
+    padding: 13px 16px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .td-campaign {
+    font-weight: 600;
+    color: var(--accent2);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+  }
+  .td-media {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .td-media.facebook { background: rgba(59,130,246,0.12); color: #93c5fd; }
+  .td-media.google { background: rgba(239,68,68,0.12); color: #fca5a5; }
+  .td-media.email { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+  .td-media.other { background: rgba(168,85,247,0.12); color: #d8b4fe; }
+  .roi-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .roi-badge.excellent { background: rgba(16,185,129,0.15); color: var(--green2); }
+  .roi-badge.good { background: rgba(99,102,241,0.15); color: var(--accent2); }
+  .roi-badge.fair { background: rgba(245,158,11,0.15); color: var(--amber2); }
+  .roi-badge.poor { background: rgba(239,68,68,0.12); color: #fca5a5; }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
+  .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+  .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
+  .rank-other { background: var(--bg3); color: var(--text2); }
+
+  /* ========== ANALYSIS SECTION ========== */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .analysis-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .analysis-card.full { grid-column: 1 / -1; }
+  .analysis-h {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .analysis-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .icon-insight { background: rgba(99,102,241,0.15); }
+  .icon-recommend { background: rgba(16,185,129,0.15); }
+  .icon-warn { background: rgba(245,158,11,0.15); }
+  .icon-country { background: rgba(6,182,212,0.15); }
+
+  .insight-list { list-style: none; }
+  .insight-list li {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text2);
+  }
+  .insight-list li:last-child { border-bottom: none; }
+  .insight-list li .bullet {
+    flex-shrink: 0;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 8px;
+  }
+  .insight-list li strong { color: var(--text); }
+  .insight-list li .bullet.accent { background: var(--accent2); }
+  .insight-list li .bullet.green { background: var(--green2); }
+  .insight-list li .bullet.amber { background: var(--amber2); }
+  .insight-list li .bullet.red { background: var(--red); }
+  .insight-list li .bullet.cyan { background: var(--cyan); }
+
+  .rec-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .rec-card:last-child { margin-bottom: 0; }
+  .rec-priority {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .rec-priority.high { color: var(--green2); }
+  .rec-priority.med { color: var(--amber2); }
+  .rec-priority.low { color: var(--text2); }
+  .rec-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .rec-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  .stat-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+  }
+  .stat-chip-val {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 2px;
+  }
+  .stat-chip-lbl {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+
+  /* ========== DIVIDER ========== */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* ========== SCHOOL COMPARE ========== */
+  .school-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .school-card {
+    border-radius: 20px;
+    padding: 26px;
+    position: relative;
+    overflow: hidden;
+  }
+  .school-card.heb {
+    background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(99,102,241,0.04) 100%);
+    border: 1px solid rgba(99,102,241,0.25);
+  }
+  .school-card.bib {
+    background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%);
+    border: 1px solid rgba(16,185,129,0.25);
+  }
+  .school-card-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
+  .school-card-sub { font-size: 12px; color: var(--text2); margin-bottom: 20px; }
+  .school-metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .school-metric {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .school-metric-val {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 2px;
+  }
+  .school-metric-lbl {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+  }
+  .school-card.heb .school-metric-val { color: var(--accent2); }
+  .school-card.bib .school-metric-val { color: var(--green2); }
+
+  /* ========== PROGRESS BARS ========== */
+  .progress-item {
+    margin-bottom: 14px;
+  }
+  .progress-item:last-child { margin-bottom: 0; }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+  }
+  .progress-label { font-size: 13px; font-weight: 500; }
+  .progress-val { font-size: 13px; font-weight: 700; }
+  .progress-bar-bg {
+    height: 7px;
+    background: var(--bg3);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ========== TOOLTIP ========== */
+  .custom-tooltip {
+    background: var(--card2) !important;
+    border: 1px solid var(--border2) !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+    font-family: 'Inter', sans-serif !important;
+  }
+
+  /* ========== SCROLLBAR ========== */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 1100px) {
+    .chart-grid-2, .chart-grid-3, .analysis-grid, .school-compare {
+      grid-template-columns: 1fr;
+    }
+    .analysis-card.full { grid-column: 1; }
+    .content { padding: 24px 20px 60px; }
+    .header, .main-nav { padding: 0 20px; }
+  }
+  @media (max-width: 700px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .header-meta .date-range { display: none; }
+  }
+
+  /* ========== FADE IN ========== */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .page.active .content > * { animation: fadeIn 0.35s ease both; }
+  .page.active .content > *:nth-child(1) { animation-delay: 0.02s; }
+  .page.active .content > *:nth-child(2) { animation-delay: 0.06s; }
+  .page.active .content > *:nth-child(3) { animation-delay: 0.10s; }
+  .page.active .content > *:nth-child(4) { animation-delay: 0.14s; }
+  .page.active .content > *:nth-child(5) { animation-delay: 0.18s; }
+  .page.active .content > *:nth-child(6) { animation-delay: 0.22s; }
+
+  .watermark {
+    position: fixed;
+    bottom: 20px; right: 24px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.15);
+    pointer-events: none;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📊</div>
+      <div>
+        <div class="logo-text">Campaign Intelligence</div>
+        <div class="logo-sub">Marketing Performance Dashboard</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="date-range" id="dateRange">Loading...</span>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        Live Data
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="main-nav-inner">
+    <div class="main-tab active" onclick="switchPage('overview', this)">Overview</div>
+    <div class="main-tab" onclick="switchPage('hebrew', this)">Hebrew School</div>
+    <div class="main-tab" onclick="switchPage('biblical', this)">Biblical School</div>
+    <div class="main-tab" onclick="switchPage('campaigns', this)">Campaign Explorer</div>
+    <div class="main-tab" onclick="switchPage('analysis', this)">Analysis & Insights</div>
+  </div>
+</nav>
+
+<!-- ===================== OVERVIEW PAGE ===================== -->
+<div class="page active" id="page-overview">
+<div class="content">
+
+  <div class="section-header">
+    <div class="school-badge all"><div class="school-dot" style="background:#a855f7"></div>All Schools Combined</div>
+    <div class="section-title">Campaign Performance Overview</div>
+    <div class="section-sub">Jan 2024 – Apr 2026 · English Language · Quality Leads · New Orders</div>
+  </div>
+
+  <div class="kpi-grid" id="overviewKPIs"></div>
+
+  <div class="school-compare" id="schoolCompare"></div>
+
+  <!-- Revenue Trend -->
+  <div class="chart-grid chart-grid-full">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Monthly Revenue Trend</div>
+          <div class="chart-card-sub">Revenue by school — Jan 2024 to Apr 2026</div>
+        </div>
+        <div class="chart-toggle">
+          <button class="chart-toggle-btn active" onclick="setTrendMode('revenue', this)">Revenue</button>
+          <button class="chart-toggle-btn" onclick="setTrendMode('roi', this)">ROI</button>
+          <button class="chart-toggle-btn" onclick="setTrendMode('leads', this)">Leads</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:300px">
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--heb-color)"></div>Hebrew Related</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--bib-color)"></div>Biblical Related</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media + Country side by side -->
+  <div class="chart-grid chart-grid-2">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Revenue by Media Channel</div>
+          <div class="chart-card-sub">Paid channels only (excluding organic)</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="mediaChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Top 10 Countries by Revenue</div>
+          <div class="chart-card-sub">Combined across both schools</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="countryChartOverview"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROI Scatter -->
+  <div class="chart-grid chart-grid-full">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Revenue vs. ROI — Top 40 Campaigns</div>
+          <div class="chart-card-sub">Bubble size = number of orders · Min spend $10K included</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:340px">
+        <canvas id="scatterChart"></canvas>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--heb-color)"></div>Hebrew Related</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--bib-color)"></div>Biblical Related</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== HEBREW PAGE ===================== -->
+<div class="page" id="page-hebrew">
+<div class="content">
+  <div class="section-header">
+    <div class="school-badge heb"><div class="school-dot heb"></div>Hebrew School</div>
+    <div class="section-title">Hebrew Related — Performance Analysis</div>
+    <div class="section-sub">Campaigns targeting Hebrew language learners</div>
+  </div>
+
+  <div class="kpi-grid" id="hebrewKPIs"></div>
+
+  <div class="chart-grid chart-grid-2">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Monthly Revenue & ROI</div>
+          <div class="chart-card-sub">Hebrew school monthly performance</div>
+        </div>
+        <div class="chart-toggle">
+          <button class="chart-toggle-btn active" onclick="setHebMode('revenue', this)">Revenue</button>
+          <button class="chart-toggle-btn" onclick="setHebMode('roi', this)">ROI</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:250px"><canvas id="hebTrendChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Media Mix — Hebrew</div>
+          <div class="chart-card-sub">Revenue distribution by channel</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:250px"><canvas id="hebMediaChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <div class="table-title">Top Hebrew Campaigns</div>
+        <div class="table-sub">Campaigns with minimum $3,000 spend</div>
+      </div>
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="setTableMode('heb', 'revenue', this)">By Revenue</button>
+        <button class="tab-btn" onclick="setTableMode('heb', 'roi', this)">By ROI</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="hebTable"></table>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Geographic Distribution — Hebrew</div>
+        <div class="chart-card-sub">Top 12 countries by revenue</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:300px"><canvas id="hebCountryChart"></canvas></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== BIBLICAL PAGE ===================== -->
+<div class="page" id="page-biblical">
+<div class="content">
+  <div class="section-header">
+    <div class="school-badge bib"><div class="school-dot bib"></div>Biblical School</div>
+    <div class="section-title">Biblical Related — Performance Analysis</div>
+    <div class="section-sub">Campaigns targeting Bible studies / faith-based learners</div>
+  </div>
+
+  <div class="kpi-grid" id="biblicalKPIs"></div>
+
+  <div class="chart-grid chart-grid-2">
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Monthly Revenue & ROI</div>
+          <div class="chart-card-sub">Biblical school monthly performance</div>
+        </div>
+        <div class="chart-toggle">
+          <button class="chart-toggle-btn active" onclick="setBibMode('revenue', this)">Revenue</button>
+          <button class="chart-toggle-btn" onclick="setBibMode('roi', this)">ROI</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:250px"><canvas id="bibTrendChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Media Mix — Biblical</div>
+          <div class="chart-card-sub">Revenue distribution by channel</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:250px"><canvas id="bibMediaChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <div class="table-title">Top Biblical Campaigns</div>
+        <div class="table-sub">Campaigns with minimum $3,000 spend</div>
+      </div>
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="setTableMode('bib', 'revenue', this)">By Revenue</button>
+        <button class="tab-btn" onclick="setTableMode('bib', 'roi', this)">By ROI</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="bibTable"></table>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-card-title">Geographic Distribution — Biblical</div>
+        <div class="chart-card-sub">Top 12 countries by revenue</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:300px"><canvas id="bibCountryChart"></canvas></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== CAMPAIGN EXPLORER PAGE ===================== -->
+<div class="page" id="page-campaigns">
+<div class="content">
+  <div class="section-header">
+    <div class="school-badge all"><div class="school-dot" style="background:#a855f7"></div>Full Dataset</div>
+    <div class="section-title">Campaign Explorer</div>
+    <div class="section-sub">All campaigns with minimum spend — sorted and filterable</div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <div class="table-title">All Top Campaigns by Revenue + ROI</div>
+        <div class="table-sub">Combined ranking across both schools</div>
+      </div>
+      <div class="tab-group">
+        <button class="tab-btn active" onclick="setTableMode('all', 'revenue', this)">By Revenue</button>
+        <button class="tab-btn" onclick="setTableMode('all', 'roi', this)">By ROI</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="allTable"></table>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== ANALYSIS PAGE ===================== -->
+<div class="page" id="page-analysis">
+<div class="content">
+
+  <div class="section-header">
+    <div class="school-badge all"><div class="school-dot" style="background:#a855f7"></div>Strategic Analysis</div>
+    <div class="section-title">Harvard-Level Insights & Recommendations</div>
+    <div class="section-sub">Statistical analysis based on Jan 2024 – Apr 2026 data · N = 749,841 daily records</div>
+  </div>
+
+  <div id="analysisContent"></div>
+
+</div>
+</div>
+
+<div class="watermark">Campaign Intelligence Dashboard</div>
+
+<script>
+// ============================================================
+//  DATA
+// ============================================================
+let DATA = null;
+
+async function loadData() {
+  const res = await fetch('./data.json');
+  DATA = await res.json();
+  initDashboard();
+}
+
+// ============================================================
+//  UTILITIES
+// ============================================================
+const fmt = {
+  currency: v => '$' + (v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(1)+'K' : v.toFixed(0)),
+  pct: v => v.toFixed(1) + '%',
+  roi: v => (v != null && !isNaN(v)) ? v.toFixed(2) + 'x' : 'N/A',
+  num: v => v.toLocaleString(),
+  short: v => v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'K' : v.toString(),
+};
+
+function getRoiBadge(roi) {
+  if (roi == null || isNaN(roi)) return `<span class="roi-badge fair">N/A</span>`;
+  if (roi >= 2.0) return `<span class="roi-badge excellent">${roi.toFixed(2)}x</span>`;
+  if (roi >= 1.2) return `<span class="roi-badge good">${roi.toFixed(2)}x</span>`;
+  if (roi >= 0.8) return `<span class="roi-badge fair">${roi.toFixed(2)}x</span>`;
+  return `<span class="roi-badge poor">${roi.toFixed(2)}x</span>`;
+}
+
+function getMediaBadge(media) {
+  const m = media.toLowerCase();
+  if (m.includes('facebook')) return `<span class="td-media facebook">▶ Facebook</span>`;
+  if (m.includes('google')) return `<span class="td-media google">G Google</span>`;
+  if (m.includes('email')) return `<span class="td-media email">✉ Email</span>`;
+  return `<span class="td-media other">${media}</span>`;
+}
+
+function getRankBadge(i) {
+  const cls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+  return `<span class="rank-badge ${cls}">${i+1}</span>`;
+}
+
+// ============================================================
+//  CHART DEFAULTS
+// ============================================================
+Chart.defaults.color = '#9999b0';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 12;
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const tickColor = '#6666888';
+
+const baseLineOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#22222d',
+      borderColor: 'rgba(255,255,255,0.12)',
+      borderWidth: 1,
+      titleColor: '#f0f0f5',
+      bodyColor: '#9999b0',
+      padding: 12,
+      cornerRadius: 10,
+      callbacks: {}
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: gridColor },
+      ticks: { color: '#666688', maxTicksLimit: 12, maxRotation: 30 }
+    },
+    y: {
+      grid: { color: gridColor },
+      ticks: { color: '#666688' }
+    }
+  }
+};
+
+// ============================================================
+//  GLOBAL CHART INSTANCES
+// ============================================================
+let charts = {};
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ============================================================
+//  PAGE SWITCHING
+// ============================================================
+function switchPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  el.classList.add('active');
+  // Trigger chart resize
+  setTimeout(() => { Object.values(charts).forEach(c => c && c.resize && c.resize()); }, 50);
+}
+
+// ============================================================
+//  TREND CHART MODES
+// ============================================================
+let trendMode = 'revenue';
+let hebTrendMode = 'revenue';
+let bibTrendMode = 'revenue';
+
+function setTrendMode(mode, btn) {
+  trendMode = mode;
+  btn.closest('.chart-toggle').querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildTrendChart();
+}
+function setHebMode(mode, btn) {
+  hebTrendMode = mode;
+  btn.closest('.chart-toggle').querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildHebTrendChart();
+}
+function setBibMode(mode, btn) {
+  bibTrendMode = mode;
+  btn.closest('.chart-toggle').querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildBibTrendChart();
+}
+
+// ============================================================
+//  TABLE MODES
+// ============================================================
+let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
+
+function setTableMode(school, mode, btn) {
+  tableModes[school] = mode;
+  btn.closest('.tab-group').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (school === 'heb') buildHebTable();
+  else if (school === 'bib') buildBibTable();
+  else buildAllTable();
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+function initDashboard() {
+  const s = DATA.summary;
+  document.getElementById('dateRange').textContent = s.overall.dateRange;
+
+  buildOverviewKPIs();
+  buildSchoolCompare();
+  buildTrendChart();
+  buildMediaChart();
+  buildCountryChartOverview();
+  buildScatterChart();
+
+  buildHebrewKPIs();
+  buildHebTrendChart();
+  buildHebMediaChart();
+  buildHebTable();
+  buildHebCountryChart();
+
+  buildBiblicalKPIs();
+  buildBibTrendChart();
+  buildBibMediaChart();
+  buildBibTable();
+  buildBibCountryChart();
+
+  buildAllTable();
+  buildAnalysis();
+}
+
+// ============================================================
+//  OVERVIEW KPIs
+// ============================================================
+function buildOverviewKPIs() {
+  const s = DATA.summary.overall;
+  const convRate = (s.orders / s.leads * 100).toFixed(1);
+  const html = `
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value">${fmt.currency(s.revenue)}</div>
+      <div class="kpi-sub">Combined both schools</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Ad Spend</div>
+      <div class="kpi-value">${fmt.currency(s.cost)}</div>
+      <div class="kpi-sub">Paid media only</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Overall ROI</div>
+      <div class="kpi-value">${s.roi.toFixed(2)}x</div>
+      <div class="kpi-sub"><span class="kpi-delta up">▲ Revenue / Cost</span></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total Leads</div>
+      <div class="kpi-value">${fmt.num(s.leads)}</div>
+      <div class="kpi-sub">Quality leads only</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Total Orders</div>
+      <div class="kpi-value">${fmt.num(s.orders)}</div>
+      <div class="kpi-sub">New order type</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Lead → Order</div>
+      <div class="kpi-value">${convRate}%</div>
+      <div class="kpi-sub">Conversion rate</div>
+    </div>
+  `;
+  document.getElementById('overviewKPIs').innerHTML = html;
+}
+
+// ============================================================
+//  SCHOOL COMPARE
+// ============================================================
+function buildSchoolCompare() {
+  const h = DATA.summary.hebrew;
+  const b = DATA.summary.biblical;
+  const hRev_pct = (h.revenue / (h.revenue + b.revenue) * 100).toFixed(1);
+  const bRev_pct = (100 - parseFloat(hRev_pct)).toFixed(1);
+
+  document.getElementById('schoolCompare').innerHTML = `
+    <div class="school-card heb">
+      <div class="school-card-title">Hebrew School</div>
+      <div class="school-card-sub">${hRev_pct}% of total revenue · ${fmt.num(h.leads)} leads</div>
+      <div class="school-metric-grid">
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.currency(h.revenue)}</div>
+          <div class="school-metric-lbl">Revenue</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${h.roi.toFixed(2)}x</div>
+          <div class="school-metric-lbl">ROI</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.currency(h.cost)}</div>
+          <div class="school-metric-lbl">Ad Spend</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.num(h.orders)}</div>
+          <div class="school-metric-lbl">Orders</div>
+        </div>
+      </div>
+    </div>
+    <div class="school-card bib">
+      <div class="school-card-title">Biblical School</div>
+      <div class="school-card-sub">${bRev_pct}% of total revenue · ${fmt.num(b.leads)} leads</div>
+      <div class="school-metric-grid">
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.currency(b.revenue)}</div>
+          <div class="school-metric-lbl">Revenue</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${b.roi.toFixed(2)}x</div>
+          <div class="school-metric-lbl">ROI</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.currency(b.cost)}</div>
+          <div class="school-metric-lbl">Ad Spend</div>
+        </div>
+        <div class="school-metric">
+          <div class="school-metric-val">${fmt.num(b.orders)}</div>
+          <div class="school-metric-lbl">Orders</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+//  TREND CHART
+// ============================================================
+function buildTrendChart() {
+  destroyChart('trend');
+  const t = DATA.trend;
+  let hebData, bibData, yLabel, yFmt;
+
+  if (trendMode === 'revenue') {
+    hebData = t.hebrew_revenue; bibData = t.biblical_revenue;
+    yLabel = 'Revenue ($)'; yFmt = v => '$' + (v/1000).toFixed(0) + 'K';
+  } else if (trendMode === 'roi') {
+    hebData = t.hebrew_roi; bibData = t.biblical_roi;
+    yLabel = 'ROI (x)'; yFmt = v => v.toFixed(2) + 'x';
+  } else {
+    hebData = t.hebrew_leads; bibData = t.biblical_leads;
+    yLabel = 'Leads'; yFmt = v => v.toLocaleString();
+  }
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  charts['trend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: t.months,
+      datasets: [
+        {
+          label: 'Hebrew',
+          data: hebData,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.08)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: '#6366f1',
+        },
+        {
+          label: 'Biblical',
+          data: bibData,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.08)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: '#10b981',
+        }
+      ]
+    },
+    options: {
+      ...baseLineOpts,
+      plugins: {
+        ...baseLineOpts.plugins,
+        tooltip: {
+          ...baseLineOpts.plugins.tooltip,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${yFmt(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: '#666688', maxTicksLimit: 14, maxRotation: 35 } },
+        y: { grid: { color: gridColor }, ticks: { color: '#666688', callback: yFmt } }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  MEDIA CHART
+// ============================================================
+function buildMediaChart() {
+  destroyChart('media');
+
+  // Merge heb + bib media data
+  const allMedia = {};
+  [...DATA.media.hebrew, ...DATA.media.biblical].forEach(m => {
+    const k = m.Media;
+    if (!allMedia[k]) allMedia[k] = { Revenue: 0, Cost: 0 };
+    allMedia[k].Revenue += m.Revenue;
+    allMedia[k].Cost += m.Cost;
+  });
+
+  // Only show paid channels
+  const paidChannels = ['Facebook', 'Google', 'Affiliates', 'PPC Other', 'Web Campaign'];
+  const labels = [], revs = [], costs = [];
+  paidChannels.forEach(ch => {
+    if (allMedia[ch] && allMedia[ch].Revenue > 0) {
+      labels.push(ch);
+      revs.push(allMedia[ch].Revenue);
+      costs.push(allMedia[ch].Cost);
+    }
+  });
+
+  const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'];
+  const ctx = document.getElementById('mediaChart').getContext('2d');
+  charts['media'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Revenue', data: revs, backgroundColor: colors.map(c => c + 'cc'), borderRadius: 8, borderWidth: 0 },
+        { label: 'Cost', data: costs, backgroundColor: colors.map(c => c + '44'), borderRadius: 8, borderWidth: 0 }
+      ]
+    },
+    options: {
+      ...baseLineOpts,
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#9999b0', usePointStyle: true, pointStyle: 'rect', boxWidth: 10 }
+        },
+        tooltip: {
+          ...baseLineOpts.plugins.tooltip,
+          callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt.currency(ctx.parsed.y)}` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9999b0' } },
+        y: { grid: { color: gridColor }, ticks: { color: '#666688', callback: v => fmt.currency(v) } }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  COUNTRY CHART OVERVIEW
+// ============================================================
+function buildCountryChartOverview() {
+  destroyChart('countryOv');
+  // Merge countries
+  const all = {};
+  [...DATA.countries.hebrew, ...DATA.countries.biblical].forEach(c => {
+    if (!all[c.CountryName]) all[c.CountryName] = 0;
+    all[c.CountryName] += c.Revenue;
+  });
+  const sorted = Object.entries(all).sort((a,b) => b[1]-a[1]).slice(0,10);
+  const labels = sorted.map(x => x[0]);
+  const vals = sorted.map(x => x[1]);
+
+  const palette = ['#6366f1','#818cf8','#10b981','#34d399','#f59e0b','#fbbf24','#ef4444','#06b6d4','#a855f7','#ec4899'];
+  const ctx = document.getElementById('countryChartOverview').getContext('2d');
+  charts['countryOv'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: vals,
+        backgroundColor: palette,
+        borderWidth: 2,
+        borderColor: '#1c1c25',
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          display: true,
+          position: 'right',
+          labels: { color: '#9999b0', font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' }
+        },
+        tooltip: {
+          ...baseLineOpts.plugins.tooltip,
+          callbacks: {
+            label: ctx => ` ${fmt.currency(ctx.parsed)}`
+          }
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  SCATTER CHART
+// ============================================================
+function buildScatterChart() {
+  destroyChart('scatter');
+  const hebData = DATA.scatter.filter(d => d.CampaignCategory === 'Hebrew Related');
+  const bibData = DATA.scatter.filter(d => d.CampaignCategory === 'Biblical Related');
+
+  function toPoint(d) {
+    return {
+      x: d.Revenue,
+      y: d.ROI,
+      r: Math.max(5, Math.min(30, d.Orders / 12)),
+      label: `Campaign ${d.CampaignID}`,
+      media: d.Media,
+      cost: d.Cost,
+      orders: d.Orders
+    };
+  }
+
+  const ctx = document.getElementById('scatterChart').getContext('2d');
+  charts['scatter'] = new Chart(ctx, {
+    type: 'bubble',
+    data: {
+      datasets: [
+        {
+          label: 'Hebrew',
+          data: hebData.map(toPoint),
+          backgroundColor: 'rgba(99,102,241,0.6)',
+          borderColor: '#6366f1',
+          borderWidth: 1.5,
+        },
+        {
+          label: 'Biblical',
+          data: bibData.map(toPoint),
+          backgroundColor: 'rgba(16,185,129,0.6)',
+          borderColor: '#10b981',
+          borderWidth: 1.5,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...baseLineOpts.plugins.tooltip,
+          callbacks: {
+            label: ctx => {
+              const d = ctx.raw;
+              return [
+                ` ${d.label} (${d.media})`,
+                ` Revenue: ${fmt.currency(d.x)}`,
+                ` ROI: ${d.y.toFixed(2)}x`,
+                ` Orders: ${d.orders}`,
+                ` Cost: ${fmt.currency(d.cost)}`
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: gridColor },
+          ticks: { color: '#666688', callback: v => fmt.currency(v) },
+          title: { display: true, text: 'Revenue', color: '#666688' }
+        },
+        y: {
+          grid: { color: gridColor },
+          ticks: { color: '#666688', callback: v => v.toFixed(1) + 'x' },
+          title: { display: true, text: 'ROI', color: '#666688' }
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  HEBREW KPIs
+// ============================================================
+function buildHebrewKPIs() {
+  const h = DATA.summary.hebrew;
+  const convRate = (h.orders / h.leads * 100).toFixed(1);
+  const revenueShare = (h.revenue / DATA.summary.overall.revenue * 100).toFixed(1);
+  document.getElementById('hebrewKPIs').innerHTML = `
+    <div class="kpi-card accent">
+      <div class="kpi-label">Revenue</div>
+      <div class="kpi-value">${fmt.currency(h.revenue)}</div>
+      <div class="kpi-sub">${revenueShare}% of total portfolio</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Ad Spend</div>
+      <div class="kpi-value">${fmt.currency(h.cost)}</div>
+      <div class="kpi-sub">Paid media only</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">ROI</div>
+      <div class="kpi-value">${h.roi.toFixed(2)}x</div>
+      <div class="kpi-sub"><span class="kpi-delta up">Higher than Biblical</span></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Leads</div>
+      <div class="kpi-value">${fmt.num(h.leads)}</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Orders</div>
+      <div class="kpi-value">${fmt.num(h.orders)}</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Conv. Rate</div>
+      <div class="kpi-value">${convRate}%</div>
+      <div class="kpi-sub">Lead to order</div>
+    </div>
+  `;
+}
+
+// ============================================================
+//  BIBLICAL KPIs
+// ============================================================
+function buildBiblicalKPIs() {
+  const b = DATA.summary.biblical;
+  const convRate = (b.orders / b.leads * 100).toFixed(1);
+  const revenueShare = (b.revenue / DATA.summary.overall.revenue * 100).toFixed(1);
+  document.getElementById('biblicalKPIs').innerHTML = `
+    <div class="kpi-card green">
+      <div class="kpi-label">Revenue</div>
+      <div class="kpi-value">${fmt.currency(b.revenue)}</div>
+      <div class="kpi-sub">${revenueShare}% of total portfolio</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Ad Spend</div>
+      <div class="kpi-value">${fmt.currency(b.cost)}</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">ROI</div>
+      <div class="kpi-value">${b.roi.toFixed(2)}x</div>
+      <div class="kpi-sub"><span class="kpi-delta neutral">Largest revenue school</span></div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Leads</div>
+      <div class="kpi-value">${fmt.num(b.leads)}</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Orders</div>
+      <div class="kpi-value">${fmt.num(b.orders)}</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Conv. Rate</div>
+      <div class="kpi-value">${convRate}%</div>
+      <div class="kpi-sub">Lead to order</div>
+    </div>
+  `;
+}
+
+// ============================================================
+//  HEB TREND CHART
+// ============================================================
+function buildHebTrendChart() {
+  destroyChart('hebTrend');
+  const t = DATA.trend;
+  const data = hebTrendMode === 'roi' ? t.hebrew_roi : t.hebrew_revenue;
+  const yFmt = hebTrendMode === 'roi' ? v => v.toFixed(2)+'x' : v => '$'+(v/1000).toFixed(0)+'K';
+  const ctx = document.getElementById('hebTrendChart').getContext('2d');
+  charts['hebTrend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: t.months,
+      datasets: [{
+        data,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.1)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#6366f1',
+      }]
+    },
+    options: {
+      ...baseLineOpts,
+      plugins: { ...baseLineOpts.plugins, tooltip: { ...baseLineOpts.plugins.tooltip, callbacks: { label: c => ` ${yFmt(c.parsed.y)}` } } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: '#666688', maxTicksLimit: 12, maxRotation: 35 } },
+        y: { grid: { color: gridColor }, ticks: { color: '#666688', callback: yFmt } }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  BIB TREND CHART
+// ============================================================
+function buildBibTrendChart() {
+  destroyChart('bibTrend');
+  const t = DATA.trend;
+  const data = bibTrendMode === 'roi' ? t.biblical_roi : t.biblical_revenue;
+  const yFmt = bibTrendMode === 'roi' ? v => v.toFixed(2)+'x' : v => '$'+(v/1000).toFixed(0)+'K';
+  const ctx = document.getElementById('bibTrendChart').getContext('2d');
+  charts['bibTrend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: t.months,
+      datasets: [{
+        data,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointBackgroundColor: '#10b981',
+      }]
+    },
+    options: {
+      ...baseLineOpts,
+      plugins: { ...baseLineOpts.plugins, tooltip: { ...baseLineOpts.plugins.tooltip, callbacks: { label: c => ` ${yFmt(c.parsed.y)}` } } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: '#666688', maxTicksLimit: 12, maxRotation: 35 } },
+        y: { grid: { color: gridColor }, ticks: { color: '#666688', callback: yFmt } }
+      }
+    }
+  });
+}
+
+// ============================================================
+//  MEDIA CHARTS (Donut per school)
+// ============================================================
+function buildSchoolMediaDonut(canvasId, chartKey, mediaData, colorBase) {
+  destroyChart(chartKey);
+  const paid = mediaData.filter(m => m.Cost > 0 && m.Revenue > 0);
+  const all = [...paid, ...mediaData.filter(m => m.Cost === 0 && m.Revenue > 0)];
+  const sorted = all.sort((a,b) => b.Revenue - a.Revenue).slice(0,6);
+  const colors = colorBase === 'heb'
+    ? ['#6366f1','#818cf8','#a5b4fc','#06b6d4','#f59e0b','#ec4899']
+    : ['#10b981','#34d399','#6ee7b7','#06b6d4','#f59e0b','#a855f7'];
+
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[chartKey] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(m => m.Media),
+      datasets: [{ data: sorted.map(m => m.Revenue), backgroundColor: colors, borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: {
+        legend: { display: true, position: 'right', labels: { color: '#9999b0', font: { size: 11 }, padding: 10, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { ...baseLineOpts.plugins.tooltip, callbacks: { label: c => ` ${fmt.currency(c.parsed)}` } }
+      }
+    }
+  });
+}
+
+function buildHebMediaChart() { buildSchoolMediaDonut('hebMediaChart', 'hebMedia', DATA.media.hebrew, 'heb'); }
+function buildBibMediaChart() { buildSchoolMediaDonut('bibMediaChart', 'bibMedia', DATA.media.biblical, 'bib'); }
+
+// ============================================================
+//  COUNTRY CHARTS (horizontal bar)
+// ============================================================
+function buildCountryBar(canvasId, chartKey, countryData, color) {
+  destroyChart(chartKey);
+  const top10 = countryData.slice(0,10);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[chartKey] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top10.map(c => c.CountryName),
+      datasets: [{
+        data: top10.map(c => c.Revenue),
+        backgroundColor: color + 'bb',
+        borderColor: color,
+        borderWidth: 1,
+        borderRadius: 7,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...baseLineOpts.plugins.tooltip,
+          callbacks: {
+            label: c => {
+              const d = top10[c.dataIndex];
+              return [
+                ` Revenue: ${fmt.currency(c.parsed.x)}`,
+                ` ROI: ${fmt.roi(d.ROI)}`,
+                ` Orders: ${d.Orders}`
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: '#666688', callback: v => fmt.currency(v) } },
+        y: { grid: { display: false }, ticks: { color: '#9999b0' } }
+      }
+    }
+  });
+}
+
+function buildHebCountryChart() { buildCountryBar('hebCountryChart', 'hebCountry', DATA.countries.hebrew, '#6366f1'); }
+function buildBibCountryChart() { buildCountryBar('bibCountryChart', 'bibCountry', DATA.countries.biblical, '#10b981'); }
+
+// ============================================================
+//  TABLES
+// ============================================================
+function buildTable(tableId, campaigns) {
+  const rows = campaigns.map((c, i) => {
+    const roi = c.ROI != null ? c.ROI : null;
+    return `<tr>
+      <td>${getRankBadge(i)}</td>
+      <td><span class="td-campaign">#${c.CampaignID}</span></td>
+      <td>${getMediaBadge(c.Media)}</td>
+      <td style="font-weight:700;color:#f0f0f5">${fmt.currency(c.Revenue)}</td>
+      <td>${fmt.currency(c.Cost)}</td>
+      <td>${getRoiBadge(roi)}</td>
+      <td>${fmt.num(c.Orders)}</td>
+      <td>${fmt.num(c.Leads)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById(tableId).innerHTML = `
+    <thead><tr>
+      <th>#</th>
+      <th>Campaign ID</th>
+      <th>Channel</th>
+      <th>Revenue</th>
+      <th>Ad Spend</th>
+      <th>ROI</th>
+      <th>Orders</th>
+      <th>Leads</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  `;
+}
+
+function buildHebTable() {
+  const data = tableModes.heb === 'revenue' ? DATA.topCampaigns.hebrew.byRevenue : DATA.topCampaigns.hebrew.byROI;
+  buildTable('hebTable', data);
+}
+function buildBibTable() {
+  const data = tableModes.bib === 'revenue' ? DATA.topCampaigns.biblical.byRevenue : DATA.topCampaigns.biblical.byROI;
+  buildTable('bibTable', data);
+}
+function buildAllTable() {
+  const data = tableModes.all === 'revenue' ? DATA.topCampaigns.all.byRevenue : DATA.topCampaigns.all.byROI;
+  buildTable('allTable', data);
+}
+
+// ============================================================
+//  ANALYSIS PAGE
+// ============================================================
+function buildAnalysis() {
+  const s = DATA.summary;
+  const h = s.hebrew, b = s.biblical;
+
+  const hConv = (h.orders / h.leads * 100).toFixed(2);
+  const bConv = (b.orders / b.leads * 100).toFixed(2);
+  const hCPO = (h.cost / h.orders).toFixed(0);
+  const bCPO = (b.cost / b.orders).toFixed(0);
+  const hAOV = (h.revenue / h.orders).toFixed(0);
+  const bAOV = (b.revenue / b.orders).toFixed(0);
+
+  // Top campaign refs
+  const topBibRev = DATA.topCampaigns.biblical.byRevenue[0];
+  const topHebRev = DATA.topCampaigns.hebrew.byRevenue[0];
+  const topHebROI = DATA.topCampaigns.hebrew.byROI[0];
+  const topBibROI = DATA.topCampaigns.biblical.byROI[0];
+
+  document.getElementById('analysisContent').innerHTML = `
+
+    <!-- SUMMARY STATS -->
+    <div class="stat-row">
+      <div class="stat-chip">
+        <div class="stat-chip-val" style="color:var(--accent2)">${fmt.currency(s.overall.revenue)}</div>
+        <div class="stat-chip-lbl">Total Revenue</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" style="color:var(--green2)">${s.overall.roi.toFixed(2)}x</div>
+        <div class="stat-chip-lbl">Portfolio ROI</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" style="color:var(--amber2)">${fmt.num(s.overall.leads)}</div>
+        <div class="stat-chip-lbl">Total Leads</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" style="color:var(--blue2)">${fmt.num(s.overall.orders)}</div>
+        <div class="stat-chip-lbl">Total Orders</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" style="color:var(--purple)">${(s.overall.orders/s.overall.leads*100).toFixed(2)}%</div>
+        <div class="stat-chip-lbl">Lead Conv. Rate</div>
+      </div>
+    </div>
+
+    <!-- SCHOOL COMPARISON DEEP DIVE -->
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-insight">📊</div>
+          Hebrew School — Key Metrics
+        </div>
+        <div class="stat-row">
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${h.roi.toFixed(2)}x</div><div class="stat-chip-lbl">ROI</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${hConv}%</div><div class="stat-chip-lbl">Conv. Rate</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">$${hCPO}</div><div class="stat-chip-lbl">Cost per Order</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">$${hAOV}</div><div class="stat-chip-lbl">Avg. Order Value</div></div>
+        </div>
+        <ul class="insight-list">
+          <li><div class="bullet accent"></div><div><strong>Superior ROI efficiency</strong> — Hebrew campaigns return <strong>${h.roi.toFixed(2)}x</strong> per dollar spent vs Biblical's ${b.roi.toFixed(2)}x. A 18% ROI advantage makes Hebrew the more capital-efficient school.</div></li>
+          <li><div class="bullet green"></div><div><strong>Higher average order value</strong> — $${hAOV} per order vs Biblical's $${bAOV}, suggesting Hebrew learners convert at higher price points or upsell more frequently.</div></li>
+          <li><div class="bullet accent"></div><div><strong>Best Google performance</strong> — Campaign #${topHebROI.CampaignID} delivers <strong>${topHebROI.ROI.toFixed(2)}x ROI</strong> on Google with ${fmt.num(topHebROI.Orders)} orders — a clear high-efficiency target for budget scaling.</div></li>
+          <li><div class="bullet amber"></div><div><strong>Facebook drag</strong> — Top Facebook campaigns (e.g. #101251, #110176) generate high revenue but sub-1x ROI, indicating over-spend on acquisition. CPC needs renegotiation.</div></li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-insight" style="background:rgba(16,185,129,0.15)">📗</div>
+          Biblical School — Key Metrics
+        </div>
+        <div class="stat-row">
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${b.roi.toFixed(2)}x</div><div class="stat-chip-lbl">ROI</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${bConv}%</div><div class="stat-chip-lbl">Conv. Rate</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">$${bCPO}</div><div class="stat-chip-lbl">Cost per Order</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">$${bAOV}</div><div class="stat-chip-lbl">Avg. Order Value</div></div>
+        </div>
+        <ul class="insight-list">
+          <li><div class="bullet green"></div><div><strong>Largest revenue generator</strong> — Biblical produces <strong>${fmt.currency(b.revenue)}</strong> (${(b.revenue/(b.revenue+h.revenue)*100).toFixed(1)}% of total), anchored by campaign #103508 which alone drove $1.1M.</div></li>
+          <li><div class="bullet accent"></div><div><strong>Massive lead volume</strong> — ${fmt.num(b.leads)} quality leads vs Hebrew's ${fmt.num(h.leads)}. The 2.9x lead volume differential suggests broader top-of-funnel reach and/or lower CPA targeting.</div></li>
+          <li><div class="bullet amber"></div><div><strong>ROI compression risk</strong> — Several high-spend Facebook campaigns (e.g. #111168 at 0.88x, #104176 at 0.50x) are revenue-heavy but ROI-negative — representing capital misallocation of ~$700K/yr if not rebalanced.</div></li>
+          <li><div class="bullet cyan"></div><div><strong>Google outperforms Facebook</strong> — Biblical Google campaigns deliver avg ~1.4x ROI vs Facebook's 0.86x. Budget reallocation to Google could improve overall ROI by an estimated 15-20%.</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- OPTIMAL CAMPAIGNS -->
+    <div class="analysis-grid">
+      <div class="analysis-card full">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-insight">🏆</div>
+          Optimal Campaigns — Dual-Criteria Analysis (Revenue × ROI)
+        </div>
+        <ul class="insight-list">
+          <li><div class="bullet accent"></div><div>
+            <strong>Hebrew #50138 (Google) — Best Overall Efficiency</strong><br>
+            Revenue: $295K · ROI: <strong>2.37x</strong> · Orders: 361 · Leads: 1,232.<br>
+            Highest revenue-generating campaign with ROI above 2x. The gold standard for Hebrew Google investment — a proven, scalable performer.
+          </div></li>
+          <li><div class="bullet accent"></div><div>
+            <strong>Hebrew #104447 (Google) — Strong Scale + Efficiency</strong><br>
+            Revenue: $290K · ROI: <strong>1.71x</strong> · Orders: 377 · Leads: 2,258.<br>
+            Second highest Hebrew revenue with solid ROI. Consistent lead quality indicates a mature, well-optimized campaign.
+          </div></li>
+          <li><div class="bullet accent"></div><div>
+            <strong>Hebrew #105658 (Google) — Reliable High Performer</strong><br>
+            Revenue: $269K · ROI: <strong>1.42x</strong> · Orders: 341 · Leads: 2,453.<br>
+            3rd by revenue, ROI positive. Strong candidate for budget increase given proven order conversion.
+          </div></li>
+          <li><div class="bullet green"></div><div>
+            <strong>Biblical #103760 (Facebook) — Best Balance in Biblical</strong><br>
+            Revenue: $362K · ROI: <strong>1.32x</strong> · Orders: 495 · Leads: 17,947.<br>
+            The only top-revenue Biblical Facebook campaign with ROI above 1.2x. Efficient at scale.
+          </div></li>
+          <li><div class="bullet green"></div><div>
+            <strong>Biblical #104544 (Google) — Google King for Biblical</strong><br>
+            Revenue: $298K · ROI: <strong>1.12x</strong> · Orders: 408 · Leads: 3,374.<br>
+            Highest Google revenue for Biblical school with positive ROI. Proven scale + efficiency combo.
+          </div></li>
+          <li><div class="bullet green"></div><div>
+            <strong>Biblical #75520 (Google) — High ROI Mid-Scale</strong><br>
+            Revenue: $112K · ROI: <strong>1.44x</strong> · Orders: 155 · Leads: 709.<br>
+            One of the few Biblical Google campaigns with above-market ROI and meaningful revenue. Increase budget allocation here.
+          </div></li>
+          <li><div class="bullet amber"></div><div>
+            <strong>Biblical #103508 (Facebook) — Revenue Giant, ROI Watch</strong><br>
+            Revenue: <strong>$1.11M</strong> · ROI: <strong>1.00x</strong> · Orders: 1,516 · Leads: 29,470.<br>
+            Largest revenue campaign in the entire portfolio. ROI is near break-even — this campaign likely drives brand awareness and downstream organic conversions not captured in direct attribution. Monitor closely but do not cut.
+          </div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="analysis-grid">
+      <div class="analysis-card full">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-recommend">💡</div>
+          Strategic Investment Recommendations
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority high">Priority 1 — SCALE IMMEDIATELY</div>
+          <div class="rec-title">Double-Down on Hebrew Google Campaigns (#50138, #104447, #104448, #105658)</div>
+          <div class="rec-desc">These 4 campaigns collectively generate $1.01M revenue at an average ROI of <strong>1.71x</strong> — the strongest risk-adjusted return in the portfolio. Google CPCs for Hebrew content appear optimally priced relative to LTV. Recommend a 30-50% budget increase on each, with close CPA monitoring during the scale phase. Google's lower CPM relative to Facebook at these conversion rates makes this the primary growth lever.</div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority high">Priority 2 — REBALANCE Biblical Facebook Budget</div>
+          <div class="rec-title">Reduce spend on ROI-negative Biblical Facebook campaigns</div>
+          <div class="rec-desc">Campaign #104176 (ROI: 0.50x, spend: $565K) and #111168 (ROI: 0.88x, spend: $637K) are consuming over $1.2M combined with sub-optimal returns. Reallocating 30% of this spend to Google Biblical campaigns (e.g. #104544, #75520, #104571) could improve the overall Biblical ROI from 1.62x to an estimated 1.85-2.0x, adding ~$200K in incremental annual profit.</div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority high">Priority 3 — Activate Biblical Google Pipeline</div>
+          <div class="rec-title">Scale #104571 (ROI: 1.80x) and #105093 (ROI: 1.56x)</div>
+          <div class="rec-desc">These mid-size Biblical Google campaigns have demonstrated exceptional ROI with meaningful lead volumes. Campaign #104571 converted 131 orders from 1,000 leads at 1.80x ROI — an outstanding efficiency score. These are under-capitalized relative to their performance profile. Target 2x spend increase with controlled A/B testing on landing pages.</div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority med">Priority 4 — Geographic Expansion</div>
+          <div class="rec-title">Prioritize Germany, Switzerland, Singapore, and UAE for incremental budget</div>
+          <div class="rec-desc">These markets exhibit exceptional ROI outliers: Germany (6.9x), Switzerland (7.8x), Singapore (4.8x). Current lead volumes suggest they are severely under-penetrated. A targeted $50K quarterly test budget per market — particularly via Google Search — could unlock $300-500K in incremental annual revenue at superior ROI multiples compared to the saturated US market.</div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority med">Priority 5 — Email Revenue Protection</div>
+          <div class="rec-title">Email Marketing generates $2.75M with $0 media cost — protect this channel</div>
+          <div class="rec-desc">Email campaigns (No Media cost) contribute $2.75M in combined revenue across both schools — 22% of total portfolio revenue at infinite ROI. This is the most capital-efficient revenue stream. Invest in CRM tooling, list segmentation, and reactivation campaigns to grow this channel before marginal paid media spend.</div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-priority low">Priority 6 — Monitor US Market Concentration</div>
+          <div class="rec-title">US represents 81% of revenue — strategic diversification needed</div>
+          <div class="rec-desc">$10.2M of the $12.5M portfolio revenue originates from the United States. While ROI is healthy at 1.56x, this concentration creates systematic risk from platform policy changes, ROAS shifts, or audience saturation. A 10% budget reallocation to high-ROI non-US markets (Germany, UK, Canada, Australia) over 12 months would reduce concentration risk while improving blended ROI.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUNTRY INSIGHTS -->
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-country">🌍</div>
+          Country Distribution — Hebrew School
+        </div>
+        <ul class="insight-list">
+          ${DATA.countries.hebrew.slice(0,8).map(c => `
+            <li>
+              <div class="bullet accent"></div>
+              <div>
+                <strong>${c.CountryName}</strong> — ${fmt.currency(c.Revenue)} revenue · ROI: ${c.ROI > 0 ? c.ROI.toFixed(2)+'x' : 'Organic'} · ${c.Orders} orders
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-h">
+          <div class="analysis-icon icon-country" style="background:rgba(16,185,129,0.15)">🌍</div>
+          Country Distribution — Biblical School
+        </div>
+        <ul class="insight-list">
+          ${DATA.countries.biblical.slice(0,8).map(c => `
+            <li>
+              <div class="bullet green"></div>
+              <div>
+                <strong>${c.CountryName}</strong> — ${fmt.currency(c.Revenue)} revenue · ROI: ${c.ROI > 0 ? c.ROI.toFixed(2)+'x' : 'Organic'} · ${c.Orders} orders
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <!-- COUNTRY ROI BARS -->
+    <div class="analysis-card" style="margin-bottom:24px">
+      <div class="analysis-h">
+        <div class="analysis-icon icon-country">📈</div>
+        High-ROI Hidden Markets — Underinvested Geographies
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        The following markets have extraordinary ROI multiples but represent <strong>under-1% of total spend</strong> — signaling significant untapped potential if budget is directed there.
+      </div>
+      ${[
+        {name:'Austria (Biblical)', roi:112.5, rev:'$16.7K', spend:'$149', note:'Near-zero spend, massive return'},
+        {name:'Costa Rica (Biblical)', roi:13.9, rev:'$10.9K', spend:'$784', note:'Tiny spend, outsized conversion'},
+        {name:'South Korea (Biblical)', roi:47.0, rev:'$10.7K', spend:'$228', note:'Faith-based learner density'},
+        {name:'Germany (Combined)', roi:6.9, rev:'$169K', spend:'$24.4K', note:'Largest underinvested English-speaking market'},
+        {name:'Switzerland (Combined)', roi:7.8, rev:'$93.6K', spend:'$12K', note:'High LTV per order — $985 avg'},
+        {name:'Mexico (Hebrew)', roi:11.7, rev:'$15.7K', spend:'$1.3K', note:'Spanish-bilingual Hebrew learner segment'},
+      ].map(m => `
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">${m.name} <span style="font-size:11px;color:var(--text2)">(${m.note})</span></span>
+            <span class="progress-val" style="color:var(--green2)">${m.roi.toFixed(1)}x ROI · ${m.rev} rev · ${m.spend} spend</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width:${Math.min(100, m.roi * 1.2)}%;background:linear-gradient(90deg, var(--green), var(--cyan))"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- METHODOLOGY NOTE -->
+    <div class="analysis-card" style="margin-bottom:0;background:rgba(99,102,241,0.04);border-color:rgba(99,102,241,0.15)">
+      <div class="analysis-h" style="font-size:13px;color:var(--text2);font-weight:500">
+        <div class="analysis-icon icon-insight" style="font-size:12px">📋</div>
+        Methodology Note
+      </div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--text)">Revenue</strong> = ActualStatCRMCourseSOV + UpsalesAmount (direct attribution, not blended model) ·
+        <strong style="color:var(--text)">ROI</strong> = Revenue ÷ Mcost (paid media only; campaigns with zero media cost excluded from ROI ranking) ·
+        <strong style="color:var(--text)">Dataset</strong>: 749,841 daily records · Jan 2024 – Apr 2026 · English language · Quality leads · New order type ·
+        <strong style="color:var(--text)">Categories</strong>: Hebrew Related + Biblical Related per CampaignCategory field ·
+        Campaigns with <$3,000 spend excluded from top-campaign tables to filter out statistical noise.
+      </div>
+    </div>
+
+  `;
+}
+
+// ============================================================
+//  BOOT
+// ============================================================
+loadData();
+</script>
+</body>
+</html>
