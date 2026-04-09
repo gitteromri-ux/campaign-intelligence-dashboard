@@ -456,10 +456,17 @@
   </div>
   <div class="table-card">
     <div class="table-header">
-      <div><div class="table-title">All Top Campaigns</div><div class="table-sub">Combined ranking across both schools · Min $5K spend</div></div>
-      <div class="tab-group">
-        <button class="tab-btn active" onclick="setTableMode('all','revenue',this)">By Revenue</button>
-        <button class="tab-btn" onclick="setTableMode('all','roi',this)">By ROI</button>
+      <div><div class="table-title">All Top Campaigns</div><div class="table-sub">Min $5K spend · Toggle school &amp; sort below</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <div class="tab-group" id="campSchoolGroup">
+          <button class="tab-btn active" onclick="setCampSchool('all',this)">All Schools</button>
+          <button class="tab-btn" onclick="setCampSchool('hebrew',this)">Hebrew</button>
+          <button class="tab-btn" onclick="setCampSchool('biblical',this)">Biblical</button>
+        </div>
+        <div class="tab-group">
+          <button class="tab-btn active" onclick="setTableMode('all','revenue',this)">By Revenue</button>
+          <button class="tab-btn" onclick="setTableMode('all','roi',this)">By ROI</button>
+        </div>
       </div>
     </div>
     <div class="table-scroll"><table id="allTable"></table></div>
@@ -488,6 +495,7 @@
 let DATA = null;
 let charts = {};
 let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
+let campSchool = 'all';
 
 const fmt = {
   $:   v => '$' + (v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(1)+'K' : Number(v).toFixed(0)),
@@ -562,8 +570,21 @@ function setTableMode(school, mode, btn) {
   tableModes[school] = mode;
   btn.closest('.tab-group').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const data = DATA.topCampaigns_v2[school === 'heb' ? 'hebrew' : school === 'bib' ? 'biblical' : 'all'];
-  buildTable(school+'Table', mode === 'revenue' ? data.byRevenue : data.byROI);
+  if (school === 'all') {
+    const data = DATA.topCampaigns_v2[campSchool];
+    buildTable('allTable', mode === 'revenue' ? data.byRevenue : data.byROI);
+  } else {
+    const data = DATA.topCampaigns_v2[school === 'heb' ? 'hebrew' : 'biblical'];
+    buildTable(school+'Table', mode === 'revenue' ? data.byRevenue : data.byROI);
+  }
+}
+
+function setCampSchool(school, btn) {
+  campSchool = school;
+  document.getElementById('campSchoolGroup').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const data = DATA.topCampaigns_v2[campSchool];
+  buildTable('allTable', tableModes.all === 'revenue' ? data.byRevenue : data.byROI);
 }
 
 // ══════════════════════════════════════════
@@ -596,7 +617,8 @@ function buildOverview() {
     <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(o.acquisitions)}</div><div class="kpi-sub">New students acquired</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Total Leads</div><div class="kpi-value">${fmt.num(o.leads)}</div><div class="kpi-sub">Quality leads only</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Total Orders</div><div class="kpi-value">${fmt.num(o.orders)}</div><div class="kpi-sub">New order type</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Lead → Order</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Conversion rate</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Lead → Order</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Lead to order conv.</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Lead → Acquisition</div><div class="kpi-value">${acqRate}%</div><div class="kpi-sub">Lead to student conv.</div></div>
   `;
 
   const hRevPct = (h.revenue / (h.revenue + b.revenue) * 100).toFixed(1);
@@ -723,10 +745,11 @@ function buildHebrew() {
     <div class="kpi-card accent"><div class="kpi-label">Revenue</div><div class="kpi-value">${fmt.$(h.revenue)}</div><div class="kpi-sub">${revShare}% of total portfolio</div></div>
     <div class="kpi-card green"><div class="kpi-label">Ad Spend</div><div class="kpi-value">${fmt.$(h.cost)}</div><div class="kpi-sub">Paid media only</div></div>
     <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${h.roi.toFixed(2)}x</div><div class="kpi-sub"><span class="kpi-delta up">Higher than Biblical</span></div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(h.acquisitions)}</div><div class="kpi-sub">Acq. rate ${acqRate}%</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(h.acquisitions)}</div><div class="kpi-sub">New students</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Leads</div><div class="kpi-value">${fmt.num(h.leads)}</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Orders</div><div class="kpi-value">${fmt.num(h.orders)}</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Conv. Rate</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Lead to order</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Lead → Order</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Lead to order conv.</div></div>
+    <div class="kpi-card accent"><div class="kpi-label">Lead → Acquisition</div><div class="kpi-value">${acqRate}%</div><div class="kpi-sub">Lead to student conv.</div></div>
   `;
   buildSchoolTrend('heb'); buildSchoolMedia('heb'); buildCountryBar('heb');
   buildTable('hebTable', DATA.topCampaigns_v2.hebrew.byRevenue);
@@ -796,10 +819,11 @@ function buildBiblical() {
     <div class="kpi-card green"><div class="kpi-label">Revenue</div><div class="kpi-value">${fmt.$(b.revenue)}</div><div class="kpi-sub">${revShare}% of total portfolio</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Ad Spend</div><div class="kpi-value">${fmt.$(b.cost)}</div></div>
     <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${b.roi.toFixed(2)}x</div><div class="kpi-sub"><span class="kpi-delta neu">Largest revenue school</span></div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(b.acquisitions)}</div><div class="kpi-sub">Acq. rate ${acqRate}%</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(b.acquisitions)}</div><div class="kpi-sub">New students</div></div>
     <div class="kpi-card accent"><div class="kpi-label">Leads</div><div class="kpi-value">${fmt.num(b.leads)}</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Orders</div><div class="kpi-value">${fmt.num(b.orders)}</div></div>
-    <div class="kpi-card red"><div class="kpi-label">Conv. Rate</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Lead to order</div></div>
+    <div class="kpi-card red"><div class="kpi-label">Lead → Order</div><div class="kpi-value">${convRate}%</div><div class="kpi-sub">Lead to order conv.</div></div>
+    <div class="kpi-card accent"><div class="kpi-label">Lead → Acquisition</div><div class="kpi-value">${acqRate}%</div><div class="kpi-sub">Lead to student conv.</div></div>
   `;
   buildSchoolTrend('bib'); buildSchoolMedia('bib'); buildCountryBar('bib');
   buildTable('bibTable', DATA.topCampaigns_v2.biblical.byRevenue);
@@ -834,7 +858,8 @@ function buildAnalysis() {
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${fmt.num(s.overall.acquisitions)}</div><div class="stat-chip-lbl">Total Acquisitions</div></div>
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">${fmt.num(s.overall.leads)}</div><div class="stat-chip-lbl">Total Leads</div></div>
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">${fmt.num(s.overall.orders)}</div><div class="stat-chip-lbl">Total Orders</div></div>
-      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--purple)">${(s.overall.orders/s.overall.leads*100).toFixed(2)}%</div><div class="stat-chip-lbl">Lead Conv. Rate</div></div>
+      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--purple)">${(s.overall.orders/s.overall.leads*100).toFixed(2)}%</div><div class="stat-chip-lbl">Lead → Order</div></div>
+      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${(s.overall.acquisitions/s.overall.leads*100).toFixed(2)}%</div><div class="stat-chip-lbl">Lead → Acquisition</div></div>
     </div>
 
     <div class="analysis-grid">
