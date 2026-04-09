@@ -1,0 +1,2923 @@
+{
+  "independent_analysis": {
+    "all": {
+      "n_days": 830,
+      "r2": 0.3852,
+      "r2_adj": 0.3762,
+      "cv_r2": 0.2267,
+      "corr_revenue": {
+        "CPL": -0.1353,
+        "CPM": 0.0246,
+        "Contact_Rate": 0.2863,
+        "Call_Rate": 0.3219,
+        "Impr_per_Lead": -0.1416,
+        "Lead_Volume": 0.3358,
+        "Budget_Deployed": 0.3384,
+        "Google_Lead_Share": -0.0081,
+        "FB_Lead_Share": -0.2521,
+        "Google_Spend_Share": 0.0966,
+        "DayOfWeek": -0.4389,
+        "Month": 0.1792,
+        "IsWeekend": -0.5374
+      },
+      "corr_roi": {
+        "CPL": -0.2793,
+        "CPM": 0.0275,
+        "Contact_Rate": 0.3103,
+        "Call_Rate": 0.3338,
+        "Impr_per_Lead": -0.24,
+        "Lead_Volume": 0.0637,
+        "Budget_Deployed": -0.1971,
+        "Google_Lead_Share": -0.0948,
+        "FB_Lead_Share": -0.2027,
+        "Google_Spend_Share": 0.093,
+        "DayOfWeek": -0.2606,
+        "Month": 0.0926,
+        "IsWeekend": -0.3386
+      },
+      "feature_importance": {
+        "Budget_Deployed": 19.37,
+        "IsWeekend": 18.91,
+        "Impr_per_Lead": 10.93,
+        "Contact_Rate": 10.36,
+        "Month": 10.02,
+        "Google_Lead_Share": 6.77,
+        "FB_Lead_Share": 6.64,
+        "CPM": 4.64,
+        "Call_Rate": 4.46,
+        "CPL": 4.43,
+        "Lead_Volume": 3.34,
+        "DayOfWeek": 0.13
+      },
+      "feature_direction": {
+        "CPL": "-",
+        "CPM": "-",
+        "Contact_Rate": "+",
+        "Call_Rate": "+",
+        "Impr_per_Lead": "-",
+        "Lead_Volume": "-",
+        "Budget_Deployed": "+",
+        "Google_Lead_Share": "-",
+        "FB_Lead_Share": "-",
+        "DayOfWeek": "+",
+        "Month": "+",
+        "IsWeekend": "-"
+      },
+      "segment_comparison": {
+        "CPL": {
+          "top20_mean": 31.25814,
+          "bot80_mean": 32.23457,
+          "ratio": 0.97
+        },
+        "CPM": {
+          "top20_mean": 23.57855,
+          "bot80_mean": 23.23468,
+          "ratio": 1.015
+        },
+        "Contact_Rate": {
+          "top20_mean": 0.47463,
+          "bot80_mean": 0.4374,
+          "ratio": 1.085
+        },
+        "Call_Rate": {
+          "top20_mean": 12.75257,
+          "bot80_mean": 11.19623,
+          "ratio": 1.139
+        },
+        "Impr_per_Lead": {
+          "top20_mean": 1375.20582,
+          "bot80_mean": 1477.86708,
+          "ratio": 0.931
+        },
+        "Lead_Volume": {
+          "top20_mean": 315.95783,
+          "bot80_mean": 280.29819,
+          "ratio": 1.127
+        },
+        "Budget_Deployed": {
+          "top20_mean": 9417.6325,
+          "bot80_mean": 8509.66357,
+          "ratio": 1.107
+        },
+        "Google_Lead_Share": {
+          "top20_mean": 0.17415,
+          "bot80_mean": 0.17043,
+          "ratio": 1.022
+        },
+        "FB_Lead_Share": {
+          "top20_mean": 0.3982,
+          "bot80_mean": 0.44285,
+          "ratio": 0.899
+        },
+        "Google_Spend_Share": {
+          "top20_mean": 0.29235,
+          "bot80_mean": 0.27408,
+          "ratio": 1.067
+        },
+        "DayOfWeek": {
+          "top20_mean": 2.1747,
+          "bot80_mean": 3.19729,
+          "ratio": 0.68
+        },
+        "Month": {
+          "top20_mean": 7.25301,
+          "bot80_mean": 5.68976,
+          "ratio": 1.275
+        },
+        "IsWeekend": {
+          "top20_mean": 0.07229,
+          "bot80_mean": 0.33735,
+          "ratio": 0.214
+        }
+      },
+      "scatter_cpl_roi": [
+        {
+          "CPL": 57.8692,
+          "ROI": 1.3178,
+          "Lead_Volume": 174,
+          "Contact_Rate": 0.5805,
+          "Budget_Deployed": 10826.9779
+        },
+        {
+          "CPL": 57.8692,
+          "ROI": 0.6919,
+          "Lead_Volume": 137,
+          "Contact_Rate": 0.5766,
+          "Budget_Deployed": 10438.7779
+        },
+        {
+          "CPL": 25.4379,
+          "ROI": 4.3242,
+          "Lead_Volume": 302,
+          "Contact_Rate": 0.5563,
+          "Budget_Deployed": 7682.2411
+        },
+        {
+          "CPL": 57.8692,
+          "ROI": 0.8752,
+          "Lead_Volume": 149,
+          "Contact_Rate": 0.2349,
+          "Budget_Deployed": 8663.6349
+        },
+        {
+          "CPL": 32.9023,
+          "ROI": 0.9697,
+          "Lead_Volume": 336,
+          "Contact_Rate": 0.4643,
+          "Budget_Deployed": 11055.181
+        },
+        {
+          "CPL": 55.9825,
+          "ROI": 1.1204,
+          "Lead_Volume": 167,
+          "Contact_Rate": 0.509,
+          "Budget_Deployed": 9349.0728
+        },
+        {
+          "CPL": 27.3624,
+          "ROI": 1.46,
+          "Lead_Volume": 342,
+          "Contact_Rate": 0.307,
+          "Budget_Deployed": 9357.9435
+        },
+        {
+          "CPL": 33.8582,
+          "ROI": 0.7286,
+          "Lead_Volume": 327,
+          "Contact_Rate": 0.4618,
+          "Budget_Deployed": 11071.6187
+        },
+        {
+          "CPL": 28.8263,
+          "ROI": 2.1131,
+          "Lead_Volume": 299,
+          "Contact_Rate": 0.5217,
+          "Budget_Deployed": 8619.071
+        },
+        {
+          "CPL": 28.5199,
+          "ROI": 2.1293,
+          "Lead_Volume": 309,
+          "Contact_Rate": 0.3657,
+          "Budget_Deployed": 8812.6371
+        },
+        {
+          "CPL": 16.471,
+          "ROI": 2.6824,
+          "Lead_Volume": 444,
+          "Contact_Rate": 0.4459,
+          "Budget_Deployed": 7313.1443
+        },
+        {
+          "CPL": 31.4022,
+          "ROI": 1.7054,
+          "Lead_Volume": 357,
+          "Contact_Rate": 0.4622,
+          "Budget_Deployed": 11210.5958
+        },
+        {
+          "CPL": 36.7317,
+          "ROI": 1.0326,
+          "Lead_Volume": 203,
+          "Contact_Rate": 0.4433,
+          "Budget_Deployed": 7456.5395
+        },
+        {
+          "CPL": 33.711,
+          "ROI": 0.6411,
+          "Lead_Volume": 411,
+          "Contact_Rate": 0.1922,
+          "Budget_Deployed": 13855.2098
+        },
+        {
+          "CPL": 19.4192,
+          "ROI": 1.8355,
+          "Lead_Volume": 521,
+          "Contact_Rate": 0.5278,
+          "Budget_Deployed": 10117.3938
+        },
+        {
+          "CPL": 25.2616,
+          "ROI": 1.8606,
+          "Lead_Volume": 296,
+          "Contact_Rate": 0.3818,
+          "Budget_Deployed": 7477.4251
+        },
+        {
+          "CPL": 27.4028,
+          "ROI": 1.7715,
+          "Lead_Volume": 297,
+          "Contact_Rate": 0.5859,
+          "Budget_Deployed": 8138.6237
+        },
+        {
+          "CPL": 28.815,
+          "ROI": 2.6623,
+          "Lead_Volume": 312,
+          "Contact_Rate": 0.6122,
+          "Budget_Deployed": 8990.2884
+        },
+        {
+          "CPL": 39.9917,
+          "ROI": 0.884,
+          "Lead_Volume": 162,
+          "Contact_Rate": 0.4198,
+          "Budget_Deployed": 6478.6501
+        },
+        {
+          "CPL": 42.2711,
+          "ROI": 0.9881,
+          "Lead_Volume": 176,
+          "Contact_Rate": 0.2898,
+          "Budget_Deployed": 7439.7147
+        },
+        {
+          "CPL": 45.2548,
+          "ROI": 1.1235,
+          "Lead_Volume": 198,
+          "Contact_Rate": 0.4394,
+          "Budget_Deployed": 8960.4544
+        },
+        {
+          "CPL": 25.1973,
+          "ROI": 1.7638,
+          "Lead_Volume": 458,
+          "Contact_Rate": 0.4432,
+          "Budget_Deployed": 11540.3669
+        },
+        {
+          "CPL": 27.4338,
+          "ROI": 1.7807,
+          "Lead_Volume": 424,
+          "Contact_Rate": 0.5094,
+          "Budget_Deployed": 11631.9336
+        },
+        {
+          "CPL": 41.4753,
+          "ROI": 1.7093,
+          "Lead_Volume": 197,
+          "Contact_Rate": 0.401,
+          "Budget_Deployed": 8170.6314
+        },
+        {
+          "CPL": 16.7622,
+          "ROI": 1.7291,
+          "Lead_Volume": 558,
+          "Contact_Rate": 0.371,
+          "Budget_Deployed": 9353.3169
+        },
+        {
+          "CPL": 34.7863,
+          "ROI": 2.4154,
+          "Lead_Volume": 283,
+          "Contact_Rate": 0.3534,
+          "Budget_Deployed": 9844.526
+        },
+        {
+          "CPL": 21.1529,
+          "ROI": 0.7929,
+          "Lead_Volume": 478,
+          "Contact_Rate": 0.2741,
+          "Budget_Deployed": 10111.1012
+        },
+        {
+          "CPL": 43.5603,
+          "ROI": 1.6821,
+          "Lead_Volume": 224,
+          "Contact_Rate": 0.3795,
+          "Budget_Deployed": 9757.511
+        },
+        {
+          "CPL": 32.2311,
+          "ROI": 2.6067,
+          "Lead_Volume": 265,
+          "Contact_Rate": 0.3509,
+          "Budget_Deployed": 8541.2481
+        },
+        {
+          "CPL": 38.9696,
+          "ROI": 0.8781,
+          "Lead_Volume": 181,
+          "Contact_Rate": 0.3591,
+          "Budget_Deployed": 7053.4926
+        },
+        {
+          "CPL": 30.967,
+          "ROI": 1.6072,
+          "Lead_Volume": 217,
+          "Contact_Rate": 0.3456,
+          "Budget_Deployed": 6719.8412
+        },
+        {
+          "CPL": 36.7374,
+          "ROI": 2.2096,
+          "Lead_Volume": 224,
+          "Contact_Rate": 0.4375,
+          "Budget_Deployed": 8229.1685
+        },
+        {
+          "CPL": 25.9494,
+          "ROI": 2.9986,
+          "Lead_Volume": 104,
+          "Contact_Rate": 0.8558,
+          "Budget_Deployed": 2698.74
+        },
+        {
+          "CPL": 37.5734,
+          "ROI": 1.9806,
+          "Lead_Volume": 238,
+          "Contact_Rate": 0.4286,
+          "Budget_Deployed": 8942.4669
+        },
+        {
+          "CPL": 24.9777,
+          "ROI": 0.96,
+          "Lead_Volume": 320,
+          "Contact_Rate": 0.5,
+          "Budget_Deployed": 7992.8481
+        },
+        {
+          "CPL": 40.8495,
+          "ROI": 0.9244,
+          "Lead_Volume": 167,
+          "Contact_Rate": 0.3713,
+          "Budget_Deployed": 6821.8608
+        },
+        {
+          "CPL": 43.8827,
+          "ROI": 0.5889,
+          "Lead_Volume": 176,
+          "Contact_Rate": 0.3977,
+          "Budget_Deployed": 7723.3583
+        },
+        {
+          "CPL": 38.5774,
+          "ROI": 0.4073,
+          "Lead_Volume": 185,
+          "Contact_Rate": 0.2919,
+          "Budget_Deployed": 7136.8257
+        },
+        {
+          "CPL": 24.5017,
+          "ROI": 1.1869,
+          "Lead_Volume": 414,
+          "Contact_Rate": 0.4469,
+          "Budget_Deployed": 10143.7014
+        },
+        {
+          "CPL": 24.7207,
+          "ROI": 0.9133,
+          "Lead_Volume": 383,
+          "Contact_Rate": 0.6397,
+          "Budget_Deployed": 9468.0378
+        },
+        {
+          "CPL": 30.9596,
+          "ROI": 3.7519,
+          "Lead_Volume": 232,
+          "Contact_Rate": 0.5129,
+          "Budget_Deployed": 7182.6249
+        },
+        {
+          "CPL": 32.238,
+          "ROI": 3.762,
+          "Lead_Volume": 275,
+          "Contact_Rate": 0.4618,
+          "Budget_Deployed": 8865.4548
+        },
+        {
+          "CPL": 18.7418,
+          "ROI": 1.5416,
+          "Lead_Volume": 519,
+          "Contact_Rate": 0.526,
+          "Budget_Deployed": 9727.013
+        },
+        {
+          "CPL": 44.0983,
+          "ROI": 3.281,
+          "Lead_Volume": 145,
+          "Contact_Rate": 0.7724,
+          "Budget_Deployed": 6394.2563
+        },
+        {
+          "CPL": 27.215,
+          "ROI": 3.5209,
+          "Lead_Volume": 268,
+          "Contact_Rate": 0.5075,
+          "Budget_Deployed": 7293.6303
+        },
+        {
+          "CPL": 21.917,
+          "ROI": 1.4261,
+          "Lead_Volume": 395,
+          "Contact_Rate": 0.5266,
+          "Budget_Deployed": 8657.2197
+        },
+        {
+          "CPL": 39.2511,
+          "ROI": 1.5785,
+          "Lead_Volume": 157,
+          "Contact_Rate": 0.5159,
+          "Budget_Deployed": 6162.4248
+        },
+        {
+          "CPL": 18.5538,
+          "ROI": 1.3772,
+          "Lead_Volume": 515,
+          "Contact_Rate": 0.2291,
+          "Budget_Deployed": 9555.2074
+        },
+        {
+          "CPL": 39.1292,
+          "ROI": 1.3298,
+          "Lead_Volume": 213,
+          "Contact_Rate": 0.4038,
+          "Budget_Deployed": 8334.5299
+        },
+        {
+          "CPL": 28.9083,
+          "ROI": 1.4546,
+          "Lead_Volume": 367,
+          "Contact_Rate": 0.5831,
+          "Budget_Deployed": 10609.356
+        },
+        {
+          "CPL": 44.3706,
+          "ROI": 1.1815,
+          "Lead_Volume": 211,
+          "Contact_Rate": 0.4692,
+          "Budget_Deployed": 9362.1869
+        },
+        {
+          "CPL": 29.6081,
+          "ROI": 2.5909,
+          "Lead_Volume": 297,
+          "Contact_Rate": 0.431,
+          "Budget_Deployed": 8793.6202
+        },
+        {
+          "CPL": 32.3947,
+          "ROI": 0.857,
+          "Lead_Volume": 280,
+          "Contact_Rate": 0.3643,
+          "Budget_Deployed": 9070.5209
+        },
+        {
+          "CPL": 36.4537,
+          "ROI": 1.2979,
+          "Lead_Volume": 232,
+          "Contact_Rate": 0.3491,
+          "Budget_Deployed": 8457.2621
+        },
+        {
+          "CPL": 34.8714,
+          "ROI": 2.6392,
+          "Lead_Volume": 234,
+          "Contact_Rate": 0.4188,
+          "Budget_Deployed": 8159.8963
+        },
+        {
+          "CPL": 34.1738,
+          "ROI": 2.067,
+          "Lead_Volume": 254,
+          "Contact_Rate": 0.4488,
+          "Budget_Deployed": 8680.1382
+        },
+        {
+          "CPL": 27.1927,
+          "ROI": 0.9394,
+          "Lead_Volume": 271,
+          "Contact_Rate": 0.3764,
+          "Budget_Deployed": 7369.2181
+        },
+        {
+          "CPL": 31.9157,
+          "ROI": 2.6986,
+          "Lead_Volume": 248,
+          "Contact_Rate": 0.6129,
+          "Budget_Deployed": 7915.0817
+        },
+        {
+          "CPL": 30.5387,
+          "ROI": 1.9325,
+          "Lead_Volume": 328,
+          "Contact_Rate": 0.4634,
+          "Budget_Deployed": 10016.685
+        },
+        {
+          "CPL": 53.8853,
+          "ROI": 1.3572,
+          "Lead_Volume": 207,
+          "Contact_Rate": 0.4493,
+          "Budget_Deployed": 11154.2643
+        },
+        {
+          "CPL": 36.7496,
+          "ROI": 1.5656,
+          "Lead_Volume": 288,
+          "Contact_Rate": 0.441,
+          "Budget_Deployed": 10583.8754
+        },
+        {
+          "CPL": 29.8453,
+          "ROI": 2.3504,
+          "Lead_Volume": 251,
+          "Contact_Rate": 0.506,
+          "Budget_Deployed": 7491.1668
+        },
+        {
+          "CPL": 32.0874,
+          "ROI": 2.0773,
+          "Lead_Volume": 274,
+          "Contact_Rate": 0.4891,
+          "Budget_Deployed": 8791.9417
+        },
+        {
+          "CPL": 22.3358,
+          "ROI": 1.7118,
+          "Lead_Volume": 194,
+          "Contact_Rate": 0.5052,
+          "Budget_Deployed": 4333.1541
+        },
+        {
+          "CPL": 39.0782,
+          "ROI": 1.2909,
+          "Lead_Volume": 215,
+          "Contact_Rate": 0.3395,
+          "Budget_Deployed": 8401.8114
+        },
+        {
+          "CPL": 29.0742,
+          "ROI": 1.3718,
+          "Lead_Volume": 356,
+          "Contact_Rate": 0.323,
+          "Budget_Deployed": 10350.4021
+        },
+        {
+          "CPL": 48.5246,
+          "ROI": 1.1878,
+          "Lead_Volume": 151,
+          "Contact_Rate": 0.4106,
+          "Budget_Deployed": 7327.2144
+        },
+        {
+          "CPL": 40.7399,
+          "ROI": 1.4205,
+          "Lead_Volume": 199,
+          "Contact_Rate": 0.4171,
+          "Budget_Deployed": 8107.2498
+        },
+        {
+          "CPL": 53.1824,
+          "ROI": 1.7634,
+          "Lead_Volume": 138,
+          "Contact_Rate": 0.7029,
+          "Budget_Deployed": 7339.1695
+        },
+        {
+          "CPL": 34.1147,
+          "ROI": 1.7778,
+          "Lead_Volume": 191,
+          "Contact_Rate": 0.2251,
+          "Budget_Deployed": 6515.9019
+        },
+        {
+          "CPL": 17.0429,
+          "ROI": 2.383,
+          "Lead_Volume": 422,
+          "Contact_Rate": 0.4408,
+          "Budget_Deployed": 7192.1135
+        },
+        {
+          "CPL": 24.2656,
+          "ROI": 1.7649,
+          "Lead_Volume": 391,
+          "Contact_Rate": 0.5703,
+          "Budget_Deployed": 9487.8511
+        },
+        {
+          "CPL": 26.3314,
+          "ROI": 1.701,
+          "Lead_Volume": 278,
+          "Contact_Rate": 0.4496,
+          "Budget_Deployed": 7320.1223
+        },
+        {
+          "CPL": 45.2552,
+          "ROI": 0.7073,
+          "Lead_Volume": 208,
+          "Contact_Rate": 0.2356,
+          "Budget_Deployed": 9413.0713
+        },
+        {
+          "CPL": 30.0853,
+          "ROI": 2.0708,
+          "Lead_Volume": 336,
+          "Contact_Rate": 0.5655,
+          "Budget_Deployed": 10108.6626
+        },
+        {
+          "CPL": 31.6173,
+          "ROI": 1.259,
+          "Lead_Volume": 314,
+          "Contact_Rate": 0.3694,
+          "Budget_Deployed": 9927.8477
+        },
+        {
+          "CPL": 26.773,
+          "ROI": 0.8681,
+          "Lead_Volume": 366,
+          "Contact_Rate": 0.5082,
+          "Budget_Deployed": 9798.9338
+        },
+        {
+          "CPL": 42.9839,
+          "ROI": 1.7116,
+          "Lead_Volume": 182,
+          "Contact_Rate": 0.3736,
+          "Budget_Deployed": 7823.0777
+        },
+        {
+          "CPL": 25.5541,
+          "ROI": 1.0466,
+          "Lead_Volume": 360,
+          "Contact_Rate": 0.3167,
+          "Budget_Deployed": 9199.4887
+        },
+        {
+          "CPL": 23.0187,
+          "ROI": 1.646,
+          "Lead_Volume": 443,
+          "Contact_Rate": 0.3973,
+          "Budget_Deployed": 10197.2929
+        },
+        {
+          "CPL": 32.8208,
+          "ROI": 0.6021,
+          "Lead_Volume": 208,
+          "Contact_Rate": 0.2115,
+          "Budget_Deployed": 6826.718
+        },
+        {
+          "CPL": 32.077,
+          "ROI": 2.7186,
+          "Lead_Volume": 255,
+          "Contact_Rate": 0.3765,
+          "Budget_Deployed": 8179.6378
+        },
+        {
+          "CPL": 27.1466,
+          "ROI": 1.7491,
+          "Lead_Volume": 348,
+          "Contact_Rate": 0.3879,
+          "Budget_Deployed": 9447.0006
+        },
+        {
+          "CPL": 29.2014,
+          "ROI": 1.7053,
+          "Lead_Volume": 430,
+          "Contact_Rate": 0.5047,
+          "Budget_Deployed": 12556.6109
+        },
+        {
+          "CPL": 35.1378,
+          "ROI": 0.8192,
+          "Lead_Volume": 296,
+          "Contact_Rate": 0.527,
+          "Budget_Deployed": 10400.797
+        },
+        {
+          "CPL": 57.8692,
+          "ROI": 1.3309,
+          "Lead_Volume": 147,
+          "Contact_Rate": 0.5238,
+          "Budget_Deployed": 8598.2796
+        },
+        {
+          "CPL": 30.6709,
+          "ROI": 1.6449,
+          "Lead_Volume": 347,
+          "Contact_Rate": 0.5533,
+          "Budget_Deployed": 10642.7866
+        },
+        {
+          "CPL": 20.3092,
+          "ROI": 2.2229,
+          "Lead_Volume": 448,
+          "Contact_Rate": 0.4799,
+          "Budget_Deployed": 9098.5025
+        },
+        {
+          "CPL": 32.171,
+          "ROI": 1.6746,
+          "Lead_Volume": 302,
+          "Contact_Rate": 0.5265,
+          "Budget_Deployed": 9715.6455
+        },
+        {
+          "CPL": 26.5463,
+          "ROI": 1.6324,
+          "Lead_Volume": 442,
+          "Contact_Rate": 0.4163,
+          "Budget_Deployed": 11733.444
+        },
+        {
+          "CPL": 33.4006,
+          "ROI": 1.9232,
+          "Lead_Volume": 265,
+          "Contact_Rate": 0.4491,
+          "Budget_Deployed": 8851.1594
+        },
+        {
+          "CPL": 30.3513,
+          "ROI": 1.0625,
+          "Lead_Volume": 226,
+          "Contact_Rate": 0.3894,
+          "Budget_Deployed": 6859.3886
+        },
+        {
+          "CPL": 35.4489,
+          "ROI": 2.5469,
+          "Lead_Volume": 272,
+          "Contact_Rate": 0.636,
+          "Budget_Deployed": 9642.0982
+        },
+        {
+          "CPL": 33.8563,
+          "ROI": 1.0674,
+          "Lead_Volume": 338,
+          "Contact_Rate": 0.5414,
+          "Budget_Deployed": 11443.436
+        },
+        {
+          "CPL": 28.1001,
+          "ROI": 2.5392,
+          "Lead_Volume": 265,
+          "Contact_Rate": 0.5132,
+          "Budget_Deployed": 7446.5141
+        },
+        {
+          "CPL": 32.0413,
+          "ROI": 1.5037,
+          "Lead_Volume": 317,
+          "Contact_Rate": 0.3028,
+          "Budget_Deployed": 10157.1073
+        },
+        {
+          "CPL": 32.8718,
+          "ROI": 1.3201,
+          "Lead_Volume": 212,
+          "Contact_Rate": 0.217,
+          "Budget_Deployed": 6968.8154
+        },
+        {
+          "CPL": 29.9975,
+          "ROI": 1.938,
+          "Lead_Volume": 287,
+          "Contact_Rate": 0.4878,
+          "Budget_Deployed": 8609.2739
+        },
+        {
+          "CPL": 38.604,
+          "ROI": 1.618,
+          "Lead_Volume": 235,
+          "Contact_Rate": 0.4,
+          "Budget_Deployed": 9071.9309
+        },
+        {
+          "CPL": 33.0261,
+          "ROI": 2.7248,
+          "Lead_Volume": 261,
+          "Contact_Rate": 0.3793,
+          "Budget_Deployed": 8619.8058
+        },
+        {
+          "CPL": 31.4563,
+          "ROI": 1.9703,
+          "Lead_Volume": 262,
+          "Contact_Rate": 0.4733,
+          "Budget_Deployed": 8241.5587
+        },
+        {
+          "CPL": 27.447,
+          "ROI": 2.2373,
+          "Lead_Volume": 262,
+          "Contact_Rate": 0.4351,
+          "Budget_Deployed": 7191.1098
+        },
+        {
+          "CPL": 51.874,
+          "ROI": 1.5283,
+          "Lead_Volume": 184,
+          "Contact_Rate": 0.4076,
+          "Budget_Deployed": 9544.8101
+        },
+        {
+          "CPL": 43.6782,
+          "ROI": 1.1733,
+          "Lead_Volume": 282,
+          "Contact_Rate": 0.4752,
+          "Budget_Deployed": 12317.2519
+        },
+        {
+          "CPL": 20.8623,
+          "ROI": 1.722,
+          "Lead_Volume": 238,
+          "Contact_Rate": 0.4706,
+          "Budget_Deployed": 4965.2389
+        },
+        {
+          "CPL": 21.2493,
+          "ROI": 1.243,
+          "Lead_Volume": 367,
+          "Contact_Rate": 0.4114,
+          "Budget_Deployed": 7798.5066
+        },
+        {
+          "CPL": 35.7165,
+          "ROI": 1.1622,
+          "Lead_Volume": 209,
+          "Contact_Rate": 0.5215,
+          "Budget_Deployed": 7464.7508
+        },
+        {
+          "CPL": 30.8694,
+          "ROI": 2.0657,
+          "Lead_Volume": 347,
+          "Contact_Rate": 0.3718,
+          "Budget_Deployed": 10711.6961
+        },
+        {
+          "CPL": 37.287,
+          "ROI": 3.155,
+          "Lead_Volume": 234,
+          "Contact_Rate": 0.4615,
+          "Budget_Deployed": 8725.1524
+        },
+        {
+          "CPL": 39.369,
+          "ROI": 1.2035,
+          "Lead_Volume": 239,
+          "Contact_Rate": 0.4812,
+          "Budget_Deployed": 9409.2
+        },
+        {
+          "CPL": 18.6628,
+          "ROI": 2.7756,
+          "Lead_Volume": 184,
+          "Contact_Rate": 0.3533,
+          "Budget_Deployed": 3433.96
+        },
+        {
+          "CPL": 29.9072,
+          "ROI": 1.4828,
+          "Lead_Volume": 288,
+          "Contact_Rate": 0.4062,
+          "Budget_Deployed": 8613.2735
+        },
+        {
+          "CPL": 15.6665,
+          "ROI": 3.3494,
+          "Lead_Volume": 158,
+          "Contact_Rate": 0.3101,
+          "Budget_Deployed": 1709.76
+        },
+        {
+          "CPL": 24.8043,
+          "ROI": 1.6904,
+          "Lead_Volume": 365,
+          "Contact_Rate": 0.3315,
+          "Budget_Deployed": 9053.5725
+        },
+        {
+          "CPL": 39.2681,
+          "ROI": 1.793,
+          "Lead_Volume": 229,
+          "Contact_Rate": 0.4017,
+          "Budget_Deployed": 8992.3935
+        },
+        {
+          "CPL": 28.237,
+          "ROI": 1.1394,
+          "Lead_Volume": 331,
+          "Contact_Rate": 0.3384,
+          "Budget_Deployed": 9346.4492
+        },
+        {
+          "CPL": 36.8329,
+          "ROI": 2.0242,
+          "Lead_Volume": 245,
+          "Contact_Rate": 0.5551,
+          "Budget_Deployed": 9024.0584
+        },
+        {
+          "CPL": 46.5733,
+          "ROI": 0.8843,
+          "Lead_Volume": 238,
+          "Contact_Rate": 0.3613,
+          "Budget_Deployed": 11084.4517
+        },
+        {
+          "CPL": 32.1584,
+          "ROI": 1.745,
+          "Lead_Volume": 259,
+          "Contact_Rate": 0.417,
+          "Budget_Deployed": 8329.0134
+        },
+        {
+          "CPL": 21.2383,
+          "ROI": 2.1273,
+          "Lead_Volume": 352,
+          "Contact_Rate": 0.5,
+          "Budget_Deployed": 7475.8893
+        }
+      ]
+    },
+    "hebrew": {
+      "n_days": 830,
+      "r2": 0.3228,
+      "r2_adj": 0.3128,
+      "cv_r2": 0.2571,
+      "corr_revenue": {
+        "CPL": -0.1741,
+        "CPM": -0.0324,
+        "Contact_Rate": 0.215,
+        "Call_Rate": 0.1751,
+        "Impr_per_Lead": -0.1354,
+        "Lead_Volume": 0.4021,
+        "Budget_Deployed": 0.3571,
+        "Google_Lead_Share": -0.1192,
+        "FB_Lead_Share": -0.1252,
+        "Google_Spend_Share": -0.0816,
+        "DayOfWeek": -0.3486,
+        "Month": 0.1072,
+        "IsWeekend": -0.4132
+      },
+      "corr_roi": {
+        "CPL": -0.1058,
+        "CPM": 0.1165,
+        "Contact_Rate": 0.1255,
+        "Call_Rate": 0.1128,
+        "Impr_per_Lead": -0.0768,
+        "Lead_Volume": -0.0578,
+        "Budget_Deployed": -0.1381,
+        "Google_Lead_Share": -0.0624,
+        "FB_Lead_Share": -0.1112,
+        "Google_Spend_Share": 0.2297,
+        "DayOfWeek": 0.0312,
+        "Month": -0.0278,
+        "IsWeekend": 0.0287
+      },
+      "feature_importance": {
+        "Budget_Deployed": 26.51,
+        "Contact_Rate": 14.79,
+        "CPL": 10.53,
+        "Impr_per_Lead": 9.25,
+        "IsWeekend": 8.64,
+        "FB_Lead_Share": 8.25,
+        "Month": 6.3,
+        "CPM": 5.02,
+        "Call_Rate": 4.01,
+        "Lead_Volume": 3.43,
+        "Google_Lead_Share": 3.19,
+        "DayOfWeek": 0.09
+      },
+      "feature_direction": {
+        "CPL": "-",
+        "CPM": "-",
+        "Contact_Rate": "+",
+        "Call_Rate": "+",
+        "Impr_per_Lead": "-",
+        "Lead_Volume": "+",
+        "Budget_Deployed": "+",
+        "Google_Lead_Share": "-",
+        "FB_Lead_Share": "-",
+        "DayOfWeek": "-",
+        "Month": "+",
+        "IsWeekend": "-"
+      },
+      "segment_comparison": {
+        "CPL": {
+          "top20_mean": 48.54169,
+          "bot80_mean": 53.32037,
+          "ratio": 0.91
+        },
+        "CPM": {
+          "top20_mean": 37.74917,
+          "bot80_mean": 37.71523,
+          "ratio": 1.001
+        },
+        "Contact_Rate": {
+          "top20_mean": 0.60134,
+          "bot80_mean": 0.54951,
+          "ratio": 1.094
+        },
+        "Call_Rate": {
+          "top20_mean": 16.51714,
+          "bot80_mean": 15.19763,
+          "ratio": 1.087
+        },
+        "Impr_per_Lead": {
+          "top20_mean": 1364.25997,
+          "bot80_mean": 1527.64057,
+          "ratio": 0.893
+        },
+        "Lead_Volume": {
+          "top20_mean": 90.54217,
+          "bot80_mean": 69.53464,
+          "ratio": 1.302
+        },
+        "Budget_Deployed": {
+          "top20_mean": 4130.45318,
+          "bot80_mean": 3435.47884,
+          "ratio": 1.202
+        },
+        "Google_Lead_Share": {
+          "top20_mean": 0.2032,
+          "bot80_mean": 0.22538,
+          "ratio": 0.902
+        },
+        "FB_Lead_Share": {
+          "top20_mean": 0.31454,
+          "bot80_mean": 0.33701,
+          "ratio": 0.933
+        },
+        "Google_Spend_Share": {
+          "top20_mean": 0.29541,
+          "bot80_mean": 0.32023,
+          "ratio": 0.922
+        },
+        "DayOfWeek": {
+          "top20_mean": 2.24096,
+          "bot80_mean": 3.18072,
+          "ratio": 0.705
+        },
+        "Month": {
+          "top20_mean": 6.6988,
+          "bot80_mean": 5.82831,
+          "ratio": 1.149
+        },
+        "IsWeekend": {
+          "top20_mean": 0.07831,
+          "bot80_mean": 0.33584,
+          "ratio": 0.233
+        }
+      },
+      "scatter_cpl_roi": [
+        {
+          "CPL": 73.4567,
+          "ROI": 2.2912,
+          "Lead_Volume": 48,
+          "Contact_Rate": 0.6458,
+          "Budget_Deployed": 3525.9193
+        },
+        {
+          "CPL": 19.7119,
+          "ROI": 1.8807,
+          "Lead_Volume": 220,
+          "Contact_Rate": 0.3227,
+          "Budget_Deployed": 4136.3281
+        },
+        {
+          "CPL": 38.0234,
+          "ROI": 2.8389,
+          "Lead_Volume": 68,
+          "Contact_Rate": 0.5588,
+          "Budget_Deployed": 2585.5905
+        },
+        {
+          "CPL": 99.493,
+          "ROI": 1.5602,
+          "Lead_Volume": 41,
+          "Contact_Rate": 0.6098,
+          "Budget_Deployed": 4079.2145
+        },
+        {
+          "CPL": 38.4928,
+          "ROI": 1.7149,
+          "Lead_Volume": 129,
+          "Contact_Rate": 0.5271,
+          "Budget_Deployed": 4965.5718
+        },
+        {
+          "CPL": 48.4686,
+          "ROI": 3.2466,
+          "Lead_Volume": 64,
+          "Contact_Rate": 0.5938,
+          "Budget_Deployed": 3101.9903
+        },
+        {
+          "CPL": 49.792,
+          "ROI": 1.0458,
+          "Lead_Volume": 76,
+          "Contact_Rate": 0.3553,
+          "Budget_Deployed": 3784.1957
+        },
+        {
+          "CPL": 45.6867,
+          "ROI": 2.3933,
+          "Lead_Volume": 91,
+          "Contact_Rate": 0.6264,
+          "Budget_Deployed": 4157.4907
+        },
+        {
+          "CPL": 60.0905,
+          "ROI": 2.5302,
+          "Lead_Volume": 83,
+          "Contact_Rate": 0.5783,
+          "Budget_Deployed": 4987.5153
+        },
+        {
+          "CPL": 57.8214,
+          "ROI": 1.3815,
+          "Lead_Volume": 68,
+          "Contact_Rate": 0.6176,
+          "Budget_Deployed": 3931.8525
+        },
+        {
+          "CPL": 44.7107,
+          "ROI": 2.22,
+          "Lead_Volume": 54,
+          "Contact_Rate": 0.8333,
+          "Budget_Deployed": 2414.3783
+        },
+        {
+          "CPL": 37.3458,
+          "ROI": 2.3971,
+          "Lead_Volume": 66,
+          "Contact_Rate": 0.5909,
+          "Budget_Deployed": 2464.8242
+        },
+        {
+          "CPL": 40.3188,
+          "ROI": 1.659,
+          "Lead_Volume": 99,
+          "Contact_Rate": 0.4545,
+          "Budget_Deployed": 3991.5641
+        },
+        {
+          "CPL": 75.123,
+          "ROI": 1.2301,
+          "Lead_Volume": 71,
+          "Contact_Rate": 0.6338,
+          "Budget_Deployed": 5333.7304
+        },
+        {
+          "CPL": 26.1875,
+          "ROI": 2.6917,
+          "Lead_Volume": 155,
+          "Contact_Rate": 0.5161,
+          "Budget_Deployed": 4059.0669
+        },
+        {
+          "CPL": 63.9831,
+          "ROI": 2.1692,
+          "Lead_Volume": 39,
+          "Contact_Rate": 0.6667,
+          "Budget_Deployed": 2495.3395
+        },
+        {
+          "CPL": 36.0645,
+          "ROI": 3.058,
+          "Lead_Volume": 114,
+          "Contact_Rate": 0.5702,
+          "Budget_Deployed": 4111.3529
+        },
+        {
+          "CPL": 48.4768,
+          "ROI": 1.0573,
+          "Lead_Volume": 90,
+          "Contact_Rate": 0.5556,
+          "Budget_Deployed": 4362.9088
+        },
+        {
+          "CPL": 50.5997,
+          "ROI": 1.6736,
+          "Lead_Volume": 57,
+          "Contact_Rate": 0.4912,
+          "Budget_Deployed": 2884.1856
+        },
+        {
+          "CPL": 73.718,
+          "ROI": 1.5297,
+          "Lead_Volume": 65,
+          "Contact_Rate": 0.3846,
+          "Budget_Deployed": 4791.6711
+        },
+        {
+          "CPL": 53.6377,
+          "ROI": 2.3408,
+          "Lead_Volume": 59,
+          "Contact_Rate": 0.5424,
+          "Budget_Deployed": 3164.6238
+        },
+        {
+          "CPL": 76.9239,
+          "ROI": 2.187,
+          "Lead_Volume": 58,
+          "Contact_Rate": 0.931,
+          "Budget_Deployed": 4461.585
+        },
+        {
+          "CPL": 46.9324,
+          "ROI": 1.8855,
+          "Lead_Volume": 86,
+          "Contact_Rate": 0.686,
+          "Budget_Deployed": 4036.1829
+        },
+        {
+          "CPL": 72.5283,
+          "ROI": 0.9441,
+          "Lead_Volume": 53,
+          "Contact_Rate": 0.434,
+          "Budget_Deployed": 3843.9989
+        },
+        {
+          "CPL": 48.8232,
+          "ROI": 0.6283,
+          "Lead_Volume": 109,
+          "Contact_Rate": 0.6789,
+          "Budget_Deployed": 5321.7306
+        },
+        {
+          "CPL": 51.6766,
+          "ROI": 3.1377,
+          "Lead_Volume": 84,
+          "Contact_Rate": 0.6905,
+          "Budget_Deployed": 4340.833
+        },
+        {
+          "CPL": 26.9778,
+          "ROI": 1.3005,
+          "Lead_Volume": 52,
+          "Contact_Rate": 0.4423,
+          "Budget_Deployed": 1402.8446
+        },
+        {
+          "CPL": 73.7919,
+          "ROI": 0.8902,
+          "Lead_Volume": 51,
+          "Contact_Rate": 0.6863,
+          "Budget_Deployed": 3763.3885
+        },
+        {
+          "CPL": 32.0921,
+          "ROI": 2.8494,
+          "Lead_Volume": 77,
+          "Contact_Rate": 0.4545,
+          "Budget_Deployed": 2471.0946
+        },
+        {
+          "CPL": 55.9854,
+          "ROI": 2.1512,
+          "Lead_Volume": 59,
+          "Contact_Rate": 0.7458,
+          "Budget_Deployed": 3303.1364
+        },
+        {
+          "CPL": 58.2776,
+          "ROI": 0.5651,
+          "Lead_Volume": 54,
+          "Contact_Rate": 0.3889,
+          "Budget_Deployed": 3146.9901
+        },
+        {
+          "CPL": 85.8677,
+          "ROI": 0.7915,
+          "Lead_Volume": 45,
+          "Contact_Rate": 0.7556,
+          "Budget_Deployed": 3864.0477
+        },
+        {
+          "CPL": 50.0468,
+          "ROI": 1.9889,
+          "Lead_Volume": 126,
+          "Contact_Rate": 0.6984,
+          "Budget_Deployed": 6305.8912
+        },
+        {
+          "CPL": 62.8814,
+          "ROI": 3.6186,
+          "Lead_Volume": 59,
+          "Contact_Rate": 0.5085,
+          "Budget_Deployed": 3710.0052
+        },
+        {
+          "CPL": 73.3513,
+          "ROI": 0.8211,
+          "Lead_Volume": 54,
+          "Contact_Rate": 0.7778,
+          "Budget_Deployed": 3960.9698
+        },
+        {
+          "CPL": 82.0532,
+          "ROI": 0.6815,
+          "Lead_Volume": 51,
+          "Contact_Rate": 0.4902,
+          "Budget_Deployed": 4184.7127
+        },
+        {
+          "CPL": 75.9007,
+          "ROI": 1.5254,
+          "Lead_Volume": 53,
+          "Contact_Rate": 0.5849,
+          "Budget_Deployed": 4022.736
+        },
+        {
+          "CPL": 71.7356,
+          "ROI": 0.0,
+          "Lead_Volume": 45,
+          "Contact_Rate": 0.2667,
+          "Budget_Deployed": 3228.1011
+        },
+        {
+          "CPL": 35.3272,
+          "ROI": 1.3195,
+          "Lead_Volume": 82,
+          "Contact_Rate": 0.4024,
+          "Budget_Deployed": 2896.83
+        },
+        {
+          "CPL": 48.5338,
+          "ROI": 0.8978,
+          "Lead_Volume": 70,
+          "Contact_Rate": 0.7857,
+          "Budget_Deployed": 3397.3648
+        },
+        {
+          "CPL": 63.6936,
+          "ROI": 1.4187,
+          "Lead_Volume": 45,
+          "Contact_Rate": 0.6,
+          "Budget_Deployed": 2866.2134
+        },
+        {
+          "CPL": 48.3624,
+          "ROI": 1.4458,
+          "Lead_Volume": 56,
+          "Contact_Rate": 0.5179,
+          "Budget_Deployed": 2708.2938
+        },
+        {
+          "CPL": 30.5846,
+          "ROI": 2.2123,
+          "Lead_Volume": 122,
+          "Contact_Rate": 0.7213,
+          "Budget_Deployed": 3731.3266
+        },
+        {
+          "CPL": 47.7957,
+          "ROI": 1.4104,
+          "Lead_Volume": 57,
+          "Contact_Rate": 0.6667,
+          "Budget_Deployed": 2724.3524
+        },
+        {
+          "CPL": 48.7078,
+          "ROI": 1.9771,
+          "Lead_Volume": 61,
+          "Contact_Rate": 0.7541,
+          "Budget_Deployed": 2971.1775
+        },
+        {
+          "CPL": 37.2983,
+          "ROI": 2.6134,
+          "Lead_Volume": 77,
+          "Contact_Rate": 0.7922,
+          "Budget_Deployed": 2871.9665
+        },
+        {
+          "CPL": 39.4566,
+          "ROI": 1.3564,
+          "Lead_Volume": 78,
+          "Contact_Rate": 0.5,
+          "Budget_Deployed": 3077.6186
+        },
+        {
+          "CPL": 67.026,
+          "ROI": 1.2824,
+          "Lead_Volume": 54,
+          "Contact_Rate": 0.4074,
+          "Budget_Deployed": 3619.4021
+        },
+        {
+          "CPL": 102.0371,
+          "ROI": 0.9132,
+          "Lead_Volume": 38,
+          "Contact_Rate": 0.5263,
+          "Budget_Deployed": 3945.2833
+        },
+        {
+          "CPL": 48.9592,
+          "ROI": 1.3312,
+          "Lead_Volume": 77,
+          "Contact_Rate": 0.7922,
+          "Budget_Deployed": 3769.8587
+        },
+        {
+          "CPL": 76.4986,
+          "ROI": 1.7444,
+          "Lead_Volume": 40,
+          "Contact_Rate": 0.625,
+          "Budget_Deployed": 3059.9424
+        },
+        {
+          "CPL": 50.9339,
+          "ROI": 2.0666,
+          "Lead_Volume": 72,
+          "Contact_Rate": 0.5833,
+          "Budget_Deployed": 3667.2388
+        },
+        {
+          "CPL": 50.1695,
+          "ROI": 2.5567,
+          "Lead_Volume": 76,
+          "Contact_Rate": 0.4868,
+          "Budget_Deployed": 3812.8785
+        },
+        {
+          "CPL": 58.8258,
+          "ROI": 3.3672,
+          "Lead_Volume": 65,
+          "Contact_Rate": 0.4462,
+          "Budget_Deployed": 3823.6747
+        },
+        {
+          "CPL": 54.6023,
+          "ROI": 1.4186,
+          "Lead_Volume": 73,
+          "Contact_Rate": 0.3425,
+          "Budget_Deployed": 3985.9706
+        },
+        {
+          "CPL": 51.9429,
+          "ROI": 0.9895,
+          "Lead_Volume": 90,
+          "Contact_Rate": 0.6333,
+          "Budget_Deployed": 4674.8636
+        },
+        {
+          "CPL": 35.3545,
+          "ROI": 2.786,
+          "Lead_Volume": 72,
+          "Contact_Rate": 0.6806,
+          "Budget_Deployed": 2545.5257
+        },
+        {
+          "CPL": 47.2103,
+          "ROI": 1.9592,
+          "Lead_Volume": 54,
+          "Contact_Rate": 0.7963,
+          "Budget_Deployed": 2549.3588
+        },
+        {
+          "CPL": 61.6687,
+          "ROI": 2.2248,
+          "Lead_Volume": 60,
+          "Contact_Rate": 0.7667,
+          "Budget_Deployed": 3700.1225
+        },
+        {
+          "CPL": 82.7721,
+          "ROI": 0.7791,
+          "Lead_Volume": 53,
+          "Contact_Rate": 0.7358,
+          "Budget_Deployed": 4386.9189
+        },
+        {
+          "CPL": 47.1929,
+          "ROI": 2.6351,
+          "Lead_Volume": 79,
+          "Contact_Rate": 0.5063,
+          "Budget_Deployed": 3728.2416
+        },
+        {
+          "CPL": 41.2314,
+          "ROI": 1.5338,
+          "Lead_Volume": 62,
+          "Contact_Rate": 0.7903,
+          "Budget_Deployed": 2556.349
+        },
+        {
+          "CPL": 43.9685,
+          "ROI": 1.0166,
+          "Lead_Volume": 79,
+          "Contact_Rate": 0.3291,
+          "Budget_Deployed": 3473.5118
+        },
+        {
+          "CPL": 40.6547,
+          "ROI": 1.5374,
+          "Lead_Volume": 45,
+          "Contact_Rate": 0.4444,
+          "Budget_Deployed": 1829.46
+        },
+        {
+          "CPL": 50.3214,
+          "ROI": 2.0674,
+          "Lead_Volume": 79,
+          "Contact_Rate": 0.481,
+          "Budget_Deployed": 3975.3914
+        },
+        {
+          "CPL": 60.2934,
+          "ROI": 1.5025,
+          "Lead_Volume": 75,
+          "Contact_Rate": 0.3867,
+          "Budget_Deployed": 4522.0075
+        },
+        {
+          "CPL": 19.7119,
+          "ROI": 2.0896,
+          "Lead_Volume": 185,
+          "Contact_Rate": 0.3459,
+          "Budget_Deployed": 3420.4884
+        },
+        {
+          "CPL": 45.4213,
+          "ROI": 3.4924,
+          "Lead_Volume": 67,
+          "Contact_Rate": 0.7761,
+          "Budget_Deployed": 3043.228
+        },
+        {
+          "CPL": 46.2953,
+          "ROI": 1.1594,
+          "Lead_Volume": 91,
+          "Contact_Rate": 0.5604,
+          "Budget_Deployed": 4212.8735
+        },
+        {
+          "CPL": 45.1642,
+          "ROI": 2.0684,
+          "Lead_Volume": 68,
+          "Contact_Rate": 0.5,
+          "Budget_Deployed": 3071.1645
+        },
+        {
+          "CPL": 27.6193,
+          "ROI": 2.9521,
+          "Lead_Volume": 98,
+          "Contact_Rate": 0.5306,
+          "Budget_Deployed": 2706.6922
+        },
+        {
+          "CPL": 59.8205,
+          "ROI": 1.7834,
+          "Lead_Volume": 59,
+          "Contact_Rate": 0.6102,
+          "Budget_Deployed": 3529.4078
+        },
+        {
+          "CPL": 48.6778,
+          "ROI": 2.1327,
+          "Lead_Volume": 87,
+          "Contact_Rate": 0.5517,
+          "Budget_Deployed": 4234.9721
+        },
+        {
+          "CPL": 66.5223,
+          "ROI": 2.955,
+          "Lead_Volume": 70,
+          "Contact_Rate": 0.8714,
+          "Budget_Deployed": 4656.5619
+        },
+        {
+          "CPL": 42.8052,
+          "ROI": 1.8747,
+          "Lead_Volume": 88,
+          "Contact_Rate": 0.5909,
+          "Budget_Deployed": 3766.8553
+        },
+        {
+          "CPL": 80.2458,
+          "ROI": 0.3864,
+          "Lead_Volume": 59,
+          "Contact_Rate": 0.4237,
+          "Budget_Deployed": 4734.5017
+        },
+        {
+          "CPL": 31.3646,
+          "ROI": 2.3136,
+          "Lead_Volume": 100,
+          "Contact_Rate": 0.54,
+          "Budget_Deployed": 3136.4584
+        },
+        {
+          "CPL": 63.3493,
+          "ROI": 2.3405,
+          "Lead_Volume": 51,
+          "Contact_Rate": 0.3922,
+          "Budget_Deployed": 3230.8157
+        },
+        {
+          "CPL": 46.1642,
+          "ROI": 1.0831,
+          "Lead_Volume": 86,
+          "Contact_Rate": 0.2558,
+          "Budget_Deployed": 3970.1217
+        },
+        {
+          "CPL": 38.6983,
+          "ROI": 2.2865,
+          "Lead_Volume": 109,
+          "Contact_Rate": 0.3945,
+          "Budget_Deployed": 4218.12
+        },
+        {
+          "CPL": 67.5904,
+          "ROI": 0.3576,
+          "Lead_Volume": 45,
+          "Contact_Rate": 0.2667,
+          "Budget_Deployed": 3041.5664
+        },
+        {
+          "CPL": 52.35,
+          "ROI": 2.1949,
+          "Lead_Volume": 62,
+          "Contact_Rate": 0.4516,
+          "Budget_Deployed": 3245.7022
+        },
+        {
+          "CPL": 55.7189,
+          "ROI": 0.9972,
+          "Lead_Volume": 82,
+          "Contact_Rate": 0.4756,
+          "Budget_Deployed": 4568.9501
+        },
+        {
+          "CPL": 34.2862,
+          "ROI": 0.8229,
+          "Lead_Volume": 147,
+          "Contact_Rate": 0.4082,
+          "Budget_Deployed": 5040.0712
+        },
+        {
+          "CPL": 49.4935,
+          "ROI": 1.6204,
+          "Lead_Volume": 111,
+          "Contact_Rate": 0.5135,
+          "Budget_Deployed": 5493.7772
+        },
+        {
+          "CPL": 60.3464,
+          "ROI": 1.5345,
+          "Lead_Volume": 71,
+          "Contact_Rate": 0.6197,
+          "Budget_Deployed": 4284.5955
+        },
+        {
+          "CPL": 45.152,
+          "ROI": 1.8562,
+          "Lead_Volume": 98,
+          "Contact_Rate": 0.5408,
+          "Budget_Deployed": 4424.8998
+        },
+        {
+          "CPL": 22.9991,
+          "ROI": 2.3193,
+          "Lead_Volume": 145,
+          "Contact_Rate": 0.4621,
+          "Budget_Deployed": 3334.8719
+        },
+        {
+          "CPL": 49.8008,
+          "ROI": 3.1071,
+          "Lead_Volume": 81,
+          "Contact_Rate": 0.6173,
+          "Budget_Deployed": 4033.867
+        },
+        {
+          "CPL": 46.1526,
+          "ROI": 1.4041,
+          "Lead_Volume": 123,
+          "Contact_Rate": 0.6829,
+          "Budget_Deployed": 5676.7672
+        },
+        {
+          "CPL": 53.2119,
+          "ROI": 0.8094,
+          "Lead_Volume": 62,
+          "Contact_Rate": 0.3387,
+          "Budget_Deployed": 3299.14
+        },
+        {
+          "CPL": 36.815,
+          "ROI": 4.7908,
+          "Lead_Volume": 80,
+          "Contact_Rate": 0.775,
+          "Budget_Deployed": 2945.2023
+        },
+        {
+          "CPL": 50.9446,
+          "ROI": 1.7072,
+          "Lead_Volume": 78,
+          "Contact_Rate": 0.5256,
+          "Budget_Deployed": 3973.6794
+        },
+        {
+          "CPL": 52.83,
+          "ROI": 2.3306,
+          "Lead_Volume": 88,
+          "Contact_Rate": 0.6477,
+          "Budget_Deployed": 4649.0378
+        },
+        {
+          "CPL": 63.6878,
+          "ROI": 1.0759,
+          "Lead_Volume": 38,
+          "Contact_Rate": 0.4211,
+          "Budget_Deployed": 2420.1362
+        },
+        {
+          "CPL": 51.8717,
+          "ROI": 2.0949,
+          "Lead_Volume": 72,
+          "Contact_Rate": 0.5556,
+          "Budget_Deployed": 3734.7602
+        },
+        {
+          "CPL": 73.2999,
+          "ROI": 1.561,
+          "Lead_Volume": 53,
+          "Contact_Rate": 0.6038,
+          "Budget_Deployed": 3884.8933
+        },
+        {
+          "CPL": 43.9191,
+          "ROI": 1.4398,
+          "Lead_Volume": 91,
+          "Contact_Rate": 0.4725,
+          "Budget_Deployed": 3996.6379
+        },
+        {
+          "CPL": 39.3108,
+          "ROI": 1.5956,
+          "Lead_Volume": 91,
+          "Contact_Rate": 0.4725,
+          "Budget_Deployed": 3577.2801
+        },
+        {
+          "CPL": 81.7725,
+          "ROI": 3.184,
+          "Lead_Volume": 40,
+          "Contact_Rate": 0.6,
+          "Budget_Deployed": 3270.9007
+        },
+        {
+          "CPL": 49.0085,
+          "ROI": 1.9788,
+          "Lead_Volume": 79,
+          "Contact_Rate": 0.481,
+          "Budget_Deployed": 3871.6712
+        },
+        {
+          "CPL": 40.7867,
+          "ROI": 2.4757,
+          "Lead_Volume": 38,
+          "Contact_Rate": 0.5,
+          "Budget_Deployed": 1549.893
+        },
+        {
+          "CPL": 71.4385,
+          "ROI": 1.1667,
+          "Lead_Volume": 57,
+          "Contact_Rate": 0.4737,
+          "Budget_Deployed": 4071.9945
+        },
+        {
+          "CPL": 65.4788,
+          "ROI": 1.6403,
+          "Lead_Volume": 116,
+          "Contact_Rate": 0.6983,
+          "Budget_Deployed": 7595.5439
+        },
+        {
+          "CPL": 45.6121,
+          "ROI": 2.0504,
+          "Lead_Volume": 35,
+          "Contact_Rate": 0.5143,
+          "Budget_Deployed": 1596.4239
+        },
+        {
+          "CPL": 38.8992,
+          "ROI": 1.1654,
+          "Lead_Volume": 75,
+          "Contact_Rate": 0.4533,
+          "Budget_Deployed": 2917.4422
+        },
+        {
+          "CPL": 55.3401,
+          "ROI": 1.6068,
+          "Lead_Volume": 58,
+          "Contact_Rate": 0.3448,
+          "Budget_Deployed": 3209.7265
+        },
+        {
+          "CPL": 53.7465,
+          "ROI": 1.3158,
+          "Lead_Volume": 94,
+          "Contact_Rate": 0.4681,
+          "Budget_Deployed": 5052.1681
+        },
+        {
+          "CPL": 50.423,
+          "ROI": 2.5402,
+          "Lead_Volume": 67,
+          "Contact_Rate": 0.6716,
+          "Budget_Deployed": 3378.3421
+        },
+        {
+          "CPL": 43.724,
+          "ROI": 1.6496,
+          "Lead_Volume": 89,
+          "Contact_Rate": 0.4944,
+          "Budget_Deployed": 3891.4402
+        },
+        {
+          "CPL": 45.6849,
+          "ROI": 2.3577,
+          "Lead_Volume": 79,
+          "Contact_Rate": 0.557,
+          "Budget_Deployed": 3609.1059
+        },
+        {
+          "CPL": 30.0834,
+          "ROI": 3.1785,
+          "Lead_Volume": 110,
+          "Contact_Rate": 0.8455,
+          "Budget_Deployed": 3309.1785
+        },
+        {
+          "CPL": 76.3316,
+          "ROI": 2.1795,
+          "Lead_Volume": 50,
+          "Contact_Rate": 0.7,
+          "Budget_Deployed": 3816.5815
+        },
+        {
+          "CPL": 57.2134,
+          "ROI": 0.4999,
+          "Lead_Volume": 60,
+          "Contact_Rate": 0.3667,
+          "Budget_Deployed": 3432.8011
+        },
+        {
+          "CPL": 71.228,
+          "ROI": 1.4301,
+          "Lead_Volume": 41,
+          "Contact_Rate": 0.5366,
+          "Budget_Deployed": 2920.3478
+        },
+        {
+          "CPL": 57.909,
+          "ROI": 1.6386,
+          "Lead_Volume": 69,
+          "Contact_Rate": 0.4058,
+          "Budget_Deployed": 3995.7234
+        },
+        {
+          "CPL": 69.6934,
+          "ROI": 2.6258,
+          "Lead_Volume": 51,
+          "Contact_Rate": 0.6471,
+          "Budget_Deployed": 3554.3638
+        },
+        {
+          "CPL": 59.0187,
+          "ROI": 2.2681,
+          "Lead_Volume": 67,
+          "Contact_Rate": 0.5522,
+          "Budget_Deployed": 3954.2539
+        },
+        {
+          "CPL": 57.1775,
+          "ROI": 3.7749,
+          "Lead_Volume": 56,
+          "Contact_Rate": 0.6071,
+          "Budget_Deployed": 3201.9417
+        },
+        {
+          "CPL": 49.2685,
+          "ROI": 1.8555,
+          "Lead_Volume": 52,
+          "Contact_Rate": 0.6154,
+          "Budget_Deployed": 2561.9623
+        }
+      ]
+    },
+    "biblical": {
+      "n_days": 830,
+      "r2": 0.2596,
+      "r2_adj": 0.2487,
+      "cv_r2": 0.0997,
+      "corr_revenue": {
+        "CPL": -0.109,
+        "CPM": 0.0648,
+        "Contact_Rate": 0.2255,
+        "Call_Rate": 0.2114,
+        "Impr_per_Lead": -0.142,
+        "Lead_Volume": 0.2205,
+        "Budget_Deployed": 0.221,
+        "Google_Lead_Share": -0.042,
+        "FB_Lead_Share": -0.1609,
+        "Google_Spend_Share": 0.0399,
+        "DayOfWeek": -0.3452,
+        "Month": 0.173,
+        "IsWeekend": -0.4352
+      },
+      "corr_roi": {
+        "CPL": -0.2134,
+        "CPM": 0.0391,
+        "Contact_Rate": 0.2551,
+        "Call_Rate": 0.2385,
+        "Impr_per_Lead": -0.2028,
+        "Lead_Volume": -0.0011,
+        "Budget_Deployed": -0.2216,
+        "Google_Lead_Share": -0.1023,
+        "FB_Lead_Share": -0.1703,
+        "Google_Spend_Share": 0.0314,
+        "DayOfWeek": -0.2086,
+        "Month": 0.107,
+        "IsWeekend": -0.2706
+      },
+      "feature_importance": {
+        "IsWeekend": 27.55,
+        "Month": 13.57,
+        "Contact_Rate": 12.49,
+        "Budget_Deployed": 12.38,
+        "Impr_per_Lead": 11.8,
+        "Google_Lead_Share": 9.25,
+        "FB_Lead_Share": 4.21,
+        "CPM": 2.51,
+        "Lead_Volume": 2.41,
+        "DayOfWeek": 1.96,
+        "Call_Rate": 1.02,
+        "CPL": 0.87
+      },
+      "feature_direction": {
+        "CPL": "+",
+        "CPM": "-",
+        "Contact_Rate": "+",
+        "Call_Rate": "-",
+        "Impr_per_Lead": "-",
+        "Lead_Volume": "-",
+        "Budget_Deployed": "+",
+        "Google_Lead_Share": "-",
+        "FB_Lead_Share": "-",
+        "DayOfWeek": "+",
+        "Month": "+",
+        "IsWeekend": "-"
+      },
+      "segment_comparison": {
+        "CPL": {
+          "top20_mean": 24.71031,
+          "bot80_mean": 26.17311,
+          "ratio": 0.944
+        },
+        "CPM": {
+          "top20_mean": 19.13242,
+          "bot80_mean": 18.69038,
+          "ratio": 1.024
+        },
+        "Contact_Rate": {
+          "top20_mean": 0.43733,
+          "bot80_mean": 0.40291,
+          "ratio": 1.085
+        },
+        "Call_Rate": {
+          "top20_mean": 11.47174,
+          "bot80_mean": 10.17254,
+          "ratio": 1.128
+        },
+        "Impr_per_Lead": {
+          "top20_mean": 1362.73838,
+          "bot80_mean": 1495.40223,
+          "ratio": 0.911
+        },
+        "Lead_Volume": {
+          "top20_mean": 230.85542,
+          "bot80_mean": 209.40361,
+          "ratio": 1.102
+        },
+        "Budget_Deployed": {
+          "top20_mean": 5337.68524,
+          "bot80_mean": 5061.55825,
+          "ratio": 1.055
+        },
+        "Google_Lead_Share": {
+          "top20_mean": 0.15028,
+          "bot80_mean": 0.1585,
+          "ratio": 0.948
+        },
+        "FB_Lead_Share": {
+          "top20_mean": 0.43349,
+          "bot80_mean": 0.47521,
+          "ratio": 0.912
+        },
+        "Google_Spend_Share": {
+          "top20_mean": 0.27341,
+          "bot80_mean": 0.25507,
+          "ratio": 1.072
+        },
+        "DayOfWeek": {
+          "top20_mean": 2.1506,
+          "bot80_mean": 3.20331,
+          "ratio": 0.671
+        },
+        "Month": {
+          "top20_mean": 7.00602,
+          "bot80_mean": 5.75151,
+          "ratio": 1.218
+        },
+        "IsWeekend": {
+          "top20_mean": 0.04819,
+          "bot80_mean": 0.34337,
+          "ratio": 0.14
+        }
+      },
+      "scatter_cpl_roi": [
+        {
+          "CPL": 47.4335,
+          "ROI": 1.7718,
+          "Lead_Volume": 138,
+          "Contact_Rate": 0.5435,
+          "Budget_Deployed": 6545.8239
+        },
+        {
+          "CPL": 55.3593,
+          "ROI": 0.6287,
+          "Lead_Volume": 84,
+          "Contact_Rate": 0.4762,
+          "Budget_Deployed": 6051.859
+        },
+        {
+          "CPL": 23.1916,
+          "ROI": 4.4397,
+          "Lead_Volume": 208,
+          "Contact_Rate": 0.5962,
+          "Budget_Deployed": 4823.8619
+        },
+        {
+          "CPL": 41.0776,
+          "ROI": 0.4996,
+          "Lead_Volume": 123,
+          "Contact_Rate": 0.187,
+          "Budget_Deployed": 5052.539
+        },
+        {
+          "CPL": 24.841,
+          "ROI": 1.0863,
+          "Lead_Volume": 271,
+          "Contact_Rate": 0.4133,
+          "Budget_Deployed": 6731.9081
+        },
+        {
+          "CPL": 55.3593,
+          "ROI": 1.3409,
+          "Lead_Volume": 108,
+          "Contact_Rate": 0.4722,
+          "Budget_Deployed": 6376.0006
+        },
+        {
+          "CPL": 20.9539,
+          "ROI": 1.7412,
+          "Lead_Volume": 266,
+          "Contact_Rate": 0.2932,
+          "Budget_Deployed": 5573.7478
+        },
+        {
+          "CPL": 26.2056,
+          "ROI": 0.3969,
+          "Lead_Volume": 267,
+          "Contact_Rate": 0.4232,
+          "Budget_Deployed": 6996.8844
+        },
+        {
+          "CPL": 20.3644,
+          "ROI": 3.1954,
+          "Lead_Volume": 209,
+          "Contact_Rate": 0.5072,
+          "Budget_Deployed": 4256.1622
+        },
+        {
+          "CPL": 21.3758,
+          "ROI": 1.0488,
+          "Lead_Volume": 228,
+          "Contact_Rate": 0.3114,
+          "Budget_Deployed": 4873.6829
+        },
+        {
+          "CPL": 13.3134,
+          "ROI": 2.5239,
+          "Lead_Volume": 346,
+          "Contact_Rate": 0.422,
+          "Budget_Deployed": 4606.452
+        },
+        {
+          "CPL": 28.5028,
+          "ROI": 1.667,
+          "Lead_Volume": 190,
+          "Contact_Rate": 0.4947,
+          "Budget_Deployed": 5415.5324
+        },
+        {
+          "CPL": 26.4116,
+          "ROI": 0.3977,
+          "Lead_Volume": 148,
+          "Contact_Rate": 0.3851,
+          "Budget_Deployed": 3908.923
+        },
+        {
+          "CPL": 25.7716,
+          "ROI": 0.5774,
+          "Lead_Volume": 351,
+          "Contact_Rate": 0.1681,
+          "Budget_Deployed": 9045.8399
+        },
+        {
+          "CPL": 16.5528,
+          "ROI": 1.2619,
+          "Lead_Volume": 366,
+          "Contact_Rate": 0.5328,
+          "Budget_Deployed": 6058.3269
+        },
+        {
+          "CPL": 19.6155,
+          "ROI": 1.285,
+          "Lead_Volume": 237,
+          "Contact_Rate": 0.3291,
+          "Budget_Deployed": 4648.8769
+        },
+        {
+          "CPL": 18.6377,
+          "ROI": 1.5339,
+          "Lead_Volume": 224,
+          "Contact_Rate": 0.5134,
+          "Budget_Deployed": 4174.8558
+        },
+        {
+          "CPL": 19.7946,
+          "ROI": 3.6936,
+          "Lead_Volume": 221,
+          "Contact_Rate": 0.5792,
+          "Budget_Deployed": 4374.6107
+        },
+        {
+          "CPL": 38.9814,
+          "ROI": 0.5479,
+          "Lead_Volume": 121,
+          "Contact_Rate": 0.3719,
+          "Budget_Deployed": 4716.7442
+        },
+        {
+          "CPL": 33.5315,
+          "ROI": 0.4912,
+          "Lead_Volume": 103,
+          "Contact_Rate": 0.2524,
+          "Budget_Deployed": 3453.7441
+        },
+        {
+          "CPL": 37.2213,
+          "ROI": 0.8672,
+          "Lead_Volume": 145,
+          "Contact_Rate": 0.4414,
+          "Budget_Deployed": 5397.0841
+        },
+        {
+          "CPL": 17.697,
+          "ROI": 1.4971,
+          "Lead_Volume": 400,
+          "Contact_Rate": 0.3725,
+          "Budget_Deployed": 7078.7819
+        },
+        {
+          "CPL": 23.5623,
+          "ROI": 1.6094,
+          "Lead_Volume": 315,
+          "Contact_Rate": 0.4921,
+          "Budget_Deployed": 7422.1266
+        },
+        {
+          "CPL": 34.4475,
+          "ROI": 2.2118,
+          "Lead_Volume": 158,
+          "Contact_Rate": 0.3861,
+          "Budget_Deployed": 5442.7101
+        },
+        {
+          "CPL": 12.4293,
+          "ROI": 2.123,
+          "Lead_Volume": 352,
+          "Contact_Rate": 0.3381,
+          "Budget_Deployed": 4375.1305
+        },
+        {
+          "CPL": 48.7154,
+          "ROI": 1.4728,
+          "Lead_Volume": 109,
+          "Contact_Rate": 0.3303,
+          "Budget_Deployed": 5309.9758
+        },
+        {
+          "CPL": 17.1578,
+          "ROI": 0.7166,
+          "Lead_Volume": 385,
+          "Contact_Rate": 0.2519,
+          "Budget_Deployed": 6605.7674
+        },
+        {
+          "CPL": 35.2365,
+          "ROI": 1.9181,
+          "Lead_Volume": 168,
+          "Contact_Rate": 0.3512,
+          "Budget_Deployed": 5919.7338
+        },
+        {
+          "CPL": 31.5819,
+          "ROI": 1.8538,
+          "Lead_Volume": 177,
+          "Contact_Rate": 0.3277,
+          "Budget_Deployed": 5589.9945
+        },
+        {
+          "CPL": 27.9639,
+          "ROI": 0.8111,
+          "Lead_Volume": 128,
+          "Contact_Rate": 0.3047,
+          "Budget_Deployed": 3579.3806
+        },
+        {
+          "CPL": 24.3478,
+          "ROI": 2.1867,
+          "Lead_Volume": 172,
+          "Contact_Rate": 0.3198,
+          "Budget_Deployed": 4187.8277
+        },
+        {
+          "CPL": 25.4051,
+          "ROI": 2.7897,
+          "Lead_Volume": 171,
+          "Contact_Rate": 0.386,
+          "Budget_Deployed": 4344.2753
+        },
+        {
+          "CPL": 23.4525,
+          "ROI": 0.7525,
+          "Lead_Volume": 55,
+          "Contact_Rate": 0.7455,
+          "Budget_Deployed": 1289.89
+        },
+        {
+          "CPL": 33.6218,
+          "ROI": 1.379,
+          "Lead_Volume": 156,
+          "Contact_Rate": 0.3654,
+          "Budget_Deployed": 5245.005
+        },
+        {
+          "CPL": 15.1574,
+          "ROI": 1.0966,
+          "Lead_Volume": 266,
+          "Contact_Rate": 0.4436,
+          "Budget_Deployed": 4031.8782
+        },
+        {
+          "CPL": 31.0841,
+          "ROI": 1.096,
+          "Lead_Volume": 103,
+          "Contact_Rate": 0.3107,
+          "Budget_Deployed": 3201.658
+        },
+        {
+          "CPL": 33.4515,
+          "ROI": 0.9007,
+          "Lead_Volume": 137,
+          "Contact_Rate": 0.3577,
+          "Budget_Deployed": 4582.8552
+        },
+        {
+          "CPL": 27.9195,
+          "ROI": 0.7437,
+          "Lead_Volume": 140,
+          "Contact_Rate": 0.3,
+          "Budget_Deployed": 3908.7247
+        },
+        {
+          "CPL": 21.8279,
+          "ROI": 1.1338,
+          "Lead_Volume": 332,
+          "Contact_Rate": 0.4578,
+          "Budget_Deployed": 7246.8714
+        },
+        {
+          "CPL": 19.3951,
+          "ROI": 0.922,
+          "Lead_Volume": 313,
+          "Contact_Rate": 0.607,
+          "Budget_Deployed": 6070.6729
+        },
+        {
+          "CPL": 27.9603,
+          "ROI": 2.0306,
+          "Lead_Volume": 166,
+          "Contact_Rate": 0.512,
+          "Budget_Deployed": 4641.4132
+        },
+        {
+          "CPL": 24.6328,
+          "ROI": 4.8004,
+          "Lead_Volume": 196,
+          "Contact_Rate": 0.4337,
+          "Budget_Deployed": 4828.0232
+        },
+        {
+          "CPL": 15.1025,
+          "ROI": 1.1242,
+          "Lead_Volume": 397,
+          "Contact_Rate": 0.466,
+          "Budget_Deployed": 5995.6865
+        },
+        {
+          "CPL": 36.8469,
+          "ROI": 2.6717,
+          "Lead_Volume": 109,
+          "Contact_Rate": 0.7431,
+          "Budget_Deployed": 4016.3099
+        },
+        {
+          "CPL": 25.3166,
+          "ROI": 1.5582,
+          "Lead_Volume": 166,
+          "Contact_Rate": 0.4759,
+          "Budget_Deployed": 4202.563
+        },
+        {
+          "CPL": 18.1926,
+          "ROI": 0.8367,
+          "Lead_Volume": 318,
+          "Contact_Rate": 0.4623,
+          "Budget_Deployed": 5785.2532
+        },
+        {
+          "CPL": 34.6866,
+          "ROI": 1.1292,
+          "Lead_Volume": 118,
+          "Contact_Rate": 0.4576,
+          "Budget_Deployed": 4093.0216
+        },
+        {
+          "CPL": 13.3214,
+          "ROI": 1.581,
+          "Lead_Volume": 447,
+          "Contact_Rate": 0.1991,
+          "Budget_Deployed": 5954.666
+        },
+        {
+          "CPL": 25.0814,
+          "ROI": 1.7042,
+          "Lead_Volume": 175,
+          "Contact_Rate": 0.3771,
+          "Budget_Deployed": 4389.2466
+        },
+        {
+          "CPL": 26.873,
+          "ROI": 0.8038,
+          "Lead_Volume": 243,
+          "Contact_Rate": 0.535,
+          "Budget_Deployed": 6530.129
+        },
+        {
+          "CPL": 36.9344,
+          "ROI": 0.6757,
+          "Lead_Volume": 165,
+          "Contact_Rate": 0.4242,
+          "Budget_Deployed": 6094.1781
+        },
+        {
+          "CPL": 22.5777,
+          "ROI": 3.0723,
+          "Lead_Volume": 218,
+          "Contact_Rate": 0.4128,
+          "Budget_Deployed": 4921.949
+        },
+        {
+          "CPL": 25.3418,
+          "ROI": 1.0176,
+          "Lead_Volume": 218,
+          "Contact_Rate": 0.3119,
+          "Budget_Deployed": 5524.5187
+        },
+        {
+          "CPL": 29.8914,
+          "ROI": 1.1267,
+          "Lead_Volume": 157,
+          "Contact_Rate": 0.2803,
+          "Budget_Deployed": 4692.9546
+        },
+        {
+          "CPL": 27.6351,
+          "ROI": 3.3457,
+          "Lead_Volume": 139,
+          "Contact_Rate": 0.3813,
+          "Budget_Deployed": 3841.2767
+        },
+        {
+          "CPL": 25.235,
+          "ROI": 1.3818,
+          "Lead_Volume": 183,
+          "Contact_Rate": 0.4098,
+          "Budget_Deployed": 4618.0136
+        },
+        {
+          "CPL": 25.1585,
+          "ROI": 1.0077,
+          "Lead_Volume": 193,
+          "Contact_Rate": 0.3627,
+          "Budget_Deployed": 4855.5928
+        },
+        {
+          "CPL": 27.1766,
+          "ROI": 3.3748,
+          "Lead_Volume": 191,
+          "Contact_Rate": 0.5969,
+          "Budget_Deployed": 5190.7294
+        },
+        {
+          "CPL": 24.3138,
+          "ROI": 1.0099,
+          "Lead_Volume": 258,
+          "Contact_Rate": 0.4109,
+          "Budget_Deployed": 6272.9523
+        },
+        {
+          "CPL": 48.5355,
+          "ROI": 0.8924,
+          "Lead_Volume": 123,
+          "Contact_Rate": 0.3659,
+          "Budget_Deployed": 5969.8714
+        },
+        {
+          "CPL": 32.8021,
+          "ROI": 0.9839,
+          "Lead_Volume": 209,
+          "Contact_Rate": 0.4163,
+          "Budget_Deployed": 6855.6337
+        },
+        {
+          "CPL": 26.4434,
+          "ROI": 1.9351,
+          "Lead_Volume": 179,
+          "Contact_Rate": 0.4804,
+          "Budget_Deployed": 4733.3639
+        },
+        {
+          "CPL": 25.3698,
+          "ROI": 2.0849,
+          "Lead_Volume": 202,
+          "Contact_Rate": 0.4554,
+          "Budget_Deployed": 5124.7029
+        },
+        {
+          "CPL": 13.0458,
+          "ROI": 2.2826,
+          "Lead_Volume": 144,
+          "Contact_Rate": 0.4722,
+          "Budget_Deployed": 1878.5973
+        },
+        {
+          "CPL": 33.1286,
+          "ROI": 0.7499,
+          "Lead_Volume": 159,
+          "Contact_Rate": 0.2893,
+          "Budget_Deployed": 5267.455
+        },
+        {
+          "CPL": 20.5026,
+          "ROI": 1.2027,
+          "Lead_Volume": 298,
+          "Contact_Rate": 0.2819,
+          "Budget_Deployed": 6109.762
+        },
+        {
+          "CPL": 41.8831,
+          "ROI": 0.9378,
+          "Lead_Volume": 94,
+          "Contact_Rate": 0.3298,
+          "Budget_Deployed": 3937.0094
+        },
+        {
+          "CPL": 29.8589,
+          "ROI": 1.0213,
+          "Lead_Volume": 161,
+          "Contact_Rate": 0.3789,
+          "Budget_Deployed": 4807.2893
+        },
+        {
+          "CPL": 34.0378,
+          "ROI": 1.4368,
+          "Lead_Volume": 91,
+          "Contact_Rate": 0.6154,
+          "Budget_Deployed": 3097.4353
+        },
+        {
+          "CPL": 28.1837,
+          "ROI": 2.1147,
+          "Lead_Volume": 141,
+          "Contact_Rate": 0.1844,
+          "Budget_Deployed": 3973.9055
+        },
+        {
+          "CPL": 15.8518,
+          "ROI": 1.9754,
+          "Lead_Volume": 288,
+          "Contact_Rate": 0.4062,
+          "Budget_Deployed": 4565.3114
+        },
+        {
+          "CPL": 17.9471,
+          "ROI": 1.7539,
+          "Lead_Volume": 332,
+          "Contact_Rate": 0.5633,
+          "Budget_Deployed": 5958.4432
+        },
+        {
+          "CPL": 16.8794,
+          "ROI": 2.3772,
+          "Lead_Volume": 218,
+          "Contact_Rate": 0.422,
+          "Budget_Deployed": 3679.7183
+        },
+        {
+          "CPL": 35.5467,
+          "ROI": 0.5624,
+          "Lead_Volume": 126,
+          "Contact_Rate": 0.246,
+          "Budget_Deployed": 4478.8803
+        },
+        {
+          "CPL": 23.8227,
+          "ROI": 1.3826,
+          "Lead_Volume": 255,
+          "Contact_Rate": 0.549,
+          "Budget_Deployed": 6074.7955
+        },
+        {
+          "CPL": 22.8221,
+          "ROI": 0.7655,
+          "Lead_Volume": 240,
+          "Contact_Rate": 0.3583,
+          "Budget_Deployed": 5477.3111
+        },
+        {
+          "CPL": 23.0489,
+          "ROI": 0.7552,
+          "Lead_Volume": 244,
+          "Contact_Rate": 0.4631,
+          "Budget_Deployed": 5623.9235
+        },
+        {
+          "CPL": 35.0554,
+          "ROI": 1.2692,
+          "Lead_Volume": 131,
+          "Contact_Rate": 0.3664,
+          "Budget_Deployed": 4592.262
+        },
+        {
+          "CPL": 19.0853,
+          "ROI": 1.0188,
+          "Lead_Volume": 274,
+          "Contact_Rate": 0.3358,
+          "Budget_Deployed": 5229.367
+        },
+        {
+          "CPL": 17.9017,
+          "ROI": 1.1941,
+          "Lead_Volume": 334,
+          "Contact_Rate": 0.3982,
+          "Budget_Deployed": 5979.173
+        },
+        {
+          "CPL": 23.2218,
+          "ROI": 0.7986,
+          "Lead_Volume": 163,
+          "Contact_Rate": 0.1963,
+          "Budget_Deployed": 3785.1516
+        },
+        {
+          "CPL": 25.302,
+          "ROI": 3.4198,
+          "Lead_Volume": 210,
+          "Contact_Rate": 0.3286,
+          "Budget_Deployed": 5313.4244
+        },
+        {
+          "CPL": 21.45,
+          "ROI": 1.8188,
+          "Lead_Volume": 259,
+          "Contact_Rate": 0.3514,
+          "Budget_Deployed": 5555.5604
+        },
+        {
+          "CPL": 24.4931,
+          "ROI": 1.6232,
+          "Lead_Volume": 332,
+          "Contact_Rate": 0.494,
+          "Budget_Deployed": 8131.7111
+        },
+        {
+          "CPL": 24.3672,
+          "ROI": 0.9291,
+          "Lead_Volume": 209,
+          "Contact_Rate": 0.5646,
+          "Budget_Deployed": 5092.7515
+        },
+        {
+          "CPL": 54.2445,
+          "ROI": 1.7838,
+          "Lead_Volume": 89,
+          "Contact_Rate": 0.4494,
+          "Budget_Deployed": 4827.7585
+        },
+        {
+          "CPL": 25.3127,
+          "ROI": 1.4978,
+          "Lead_Volume": 261,
+          "Contact_Rate": 0.5096,
+          "Budget_Deployed": 6606.6038
+        },
+        {
+          "CPL": 19.0219,
+          "ROI": 2.1672,
+          "Lead_Volume": 303,
+          "Contact_Rate": 0.4884,
+          "Budget_Deployed": 5763.6307
+        },
+        {
+          "CPL": 23.409,
+          "ROI": 1.3479,
+          "Lead_Volume": 252,
+          "Contact_Rate": 0.4921,
+          "Budget_Deployed": 5899.064
+        },
+        {
+          "CPL": 18.7655,
+          "ROI": 2.079,
+          "Lead_Volume": 325,
+          "Contact_Rate": 0.3446,
+          "Budget_Deployed": 6098.8023
+        },
+        {
+          "CPL": 30.3097,
+          "ROI": 2.1455,
+          "Lead_Volume": 174,
+          "Contact_Rate": 0.4368,
+          "Budget_Deployed": 5273.8792
+        },
+        {
+          "CPL": 25.3139,
+          "ROI": 0.703,
+          "Lead_Volume": 162,
+          "Contact_Rate": 0.3395,
+          "Budget_Deployed": 4100.8562
+        },
+        {
+          "CPL": 28.3142,
+          "ROI": 2.5074,
+          "Lead_Volume": 200,
+          "Contact_Rate": 0.53,
+          "Budget_Deployed": 5662.849
+        },
+        {
+          "CPL": 26.2358,
+          "ROI": 1.0678,
+          "Lead_Volume": 272,
+          "Contact_Rate": 0.4926,
+          "Budget_Deployed": 7136.141
+        },
+        {
+          "CPL": 24.6747,
+          "ROI": 2.3798,
+          "Lead_Volume": 197,
+          "Contact_Rate": 0.4975,
+          "Budget_Deployed": 4860.9236
+        },
+        {
+          "CPL": 26.3246,
+          "ROI": 0.8709,
+          "Lead_Volume": 241,
+          "Contact_Rate": 0.2448,
+          "Budget_Deployed": 6344.2288
+        },
+        {
+          "CPL": 22.4266,
+          "ROI": 1.3464,
+          "Lead_Volume": 172,
+          "Contact_Rate": 0.186,
+          "Budget_Deployed": 3857.3766
+        },
+        {
+          "CPL": 24.5623,
+          "ROI": 2.1791,
+          "Lead_Volume": 188,
+          "Contact_Rate": 0.5053,
+          "Budget_Deployed": 4617.7098
+        },
+        {
+          "CPL": 30.2998,
+          "ROI": 1.2304,
+          "Lead_Volume": 184,
+          "Contact_Rate": 0.337,
+          "Budget_Deployed": 5575.1716
+        },
+        {
+          "CPL": 25.1009,
+          "ROI": 2.4802,
+          "Lead_Volume": 194,
+          "Contact_Rate": 0.2887,
+          "Budget_Deployed": 4869.577
+        },
+        {
+          "CPL": 33.1472,
+          "ROI": 2.4262,
+          "Lead_Volume": 149,
+          "Contact_Rate": 0.4362,
+          "Budget_Deployed": 4938.9308
+        },
+        {
+          "CPL": 24.5251,
+          "ROI": 2.602,
+          "Lead_Volume": 205,
+          "Contact_Rate": 0.4341,
+          "Budget_Deployed": 5027.6552
+        },
+        {
+          "CPL": 45.4857,
+          "ROI": 1.9536,
+          "Lead_Volume": 127,
+          "Contact_Rate": 0.3465,
+          "Budget_Deployed": 5776.6831
+        },
+        {
+          "CPL": 29.4855,
+          "ROI": 1.3609,
+          "Lead_Volume": 172,
+          "Contact_Rate": 0.4884,
+          "Budget_Deployed": 5071.4996
+        },
+        {
+          "CPL": 16.5951,
+          "ROI": 1.5664,
+          "Lead_Volume": 203,
+          "Contact_Rate": 0.4631,
+          "Budget_Deployed": 3368.815
+        },
+        {
+          "CPL": 16.716,
+          "ROI": 1.2894,
+          "Lead_Volume": 292,
+          "Contact_Rate": 0.4007,
+          "Budget_Deployed": 4881.0643
+        },
+        {
+          "CPL": 28.4175,
+          "ROI": 1.2946,
+          "Lead_Volume": 161,
+          "Contact_Rate": 0.5031,
+          "Budget_Deployed": 4575.2103
+        },
+        {
+          "CPL": 22.4878,
+          "ROI": 2.4505,
+          "Lead_Volume": 258,
+          "Contact_Rate": 0.3488,
+          "Budget_Deployed": 5801.8461
+        },
+        {
+          "CPL": 31.5872,
+          "ROI": 3.2914,
+          "Lead_Volume": 163,
+          "Contact_Rate": 0.3926,
+          "Budget_Deployed": 5148.7075
+        },
+        {
+          "CPL": 27.1423,
+          "ROI": 1.6018,
+          "Lead_Volume": 213,
+          "Contact_Rate": 0.4272,
+          "Budget_Deployed": 5781.3035
+        },
+        {
+          "CPL": 11.638,
+          "ROI": 4.1872,
+          "Lead_Volume": 139,
+          "Contact_Rate": 0.3237,
+          "Budget_Deployed": 1604.5
+        },
+        {
+          "CPL": 21.6402,
+          "ROI": 1.0638,
+          "Lead_Volume": 209,
+          "Contact_Rate": 0.378,
+          "Budget_Deployed": 4522.8076
+        },
+        {
+          "CPL": 11.6615,
+          "ROI": 2.1128,
+          "Lead_Volume": 146,
+          "Contact_Rate": 0.2534,
+          "Budget_Deployed": 1702.58
+        },
+        {
+          "CPL": 19.2342,
+          "ROI": 1.0099,
+          "Lead_Volume": 255,
+          "Contact_Rate": 0.2863,
+          "Budget_Deployed": 4904.7125
+        },
+        {
+          "CPL": 31.3886,
+          "ROI": 1.8181,
+          "Lead_Volume": 189,
+          "Contact_Rate": 0.3545,
+          "Budget_Deployed": 5932.4511
+        },
+        {
+          "CPL": 21.2859,
+          "ROI": 1.1257,
+          "Lead_Volume": 249,
+          "Contact_Rate": 0.3012,
+          "Budget_Deployed": 5300.1959
+        },
+        {
+          "CPL": 31.1406,
+          "ROI": 1.5705,
+          "Lead_Volume": 182,
+          "Contact_Rate": 0.4451,
+          "Budget_Deployed": 5667.5812
+        },
+        {
+          "CPL": 35.4042,
+          "ROI": 0.5372,
+          "Lead_Volume": 196,
+          "Contact_Rate": 0.3112,
+          "Budget_Deployed": 6939.2296
+        },
+        {
+          "CPL": 28.3468,
+          "ROI": 1.1749,
+          "Lead_Volume": 187,
+          "Contact_Rate": 0.3957,
+          "Budget_Deployed": 5300.8509
+        },
+        {
+          "CPL": 15.6617,
+          "ROI": 2.2873,
+          "Lead_Volume": 272,
+          "Contact_Rate": 0.4154,
+          "Budget_Deployed": 4259.9773
+        }
+      ]
+    }
+  }
+}
