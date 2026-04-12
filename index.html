@@ -305,6 +305,7 @@
     <div class="main-tab" onclick="switchPage('biblical',this)">Biblical School</div>
     <div class="main-tab" onclick="switchPage('campaigns',this)">Campaign Explorer</div>
     <div class="main-tab" onclick="switchPage('analysis',this)">Analysis &amp; Insights</div>
+    <div class="main-tab" onclick="switchPage('april',this)">April Deep-Dive</div>
   </div>
 </nav>
 
@@ -486,6 +487,90 @@
 </div>
 </div>
 
+<!-- ══════════ APRIL DEEP-DIVE ══════════ -->
+<div class="page" id="page-april">
+<div class="content">
+  <div class="section-header">
+    <div class="school-badge all"><div class="school-dot" style="background:#ef4444"></div>Performance Alert</div>
+    <div class="section-title">April 2026 Deep-Dive — Facebook &amp; Google</div>
+    <div class="section-sub">Diagnosing underperformance · Campaign-level analysis · Apr 1–12 comparable window</div>
+  </div>
+
+  <!-- YoY KPI row -->
+  <div class="kpi-grid" id="aprKpis" style="margin-bottom:24px"></div>
+
+  <!-- YoY Comparison cards -->
+  <div class="chart-grid chart-grid-2" style="margin-bottom:24px">
+    <div class="chart-card">
+      <div class="chart-card-header"><div>
+        <div class="chart-card-title">Year-over-Year: April 1–12</div>
+        <div class="chart-card-sub">Comparable 12-day window across 2024, 2025, 2026</div>
+      </div></div>
+      <div class="chart-wrap" style="height:280px"><canvas id="aprYoyChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header"><div>
+        <div class="chart-card-title">April Daily Revenue by Channel</div>
+        <div class="chart-card-sub">Facebook vs Google · Apr 2026 day-by-day</div>
+      </div></div>
+      <div class="chart-wrap" style="height:280px"><canvas id="aprDailyChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- FB vs Google head-to-head -->
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title">Facebook vs Google — Head-to-Head (April 2026)</div>
+      <div class="chart-card-sub">All metrics side-by-side · Revenue, ROI, CPL, Leads, Orders, Acquisitions</div>
+    </div></div>
+    <div class="table-scroll" id="aprMediaTable"></div>
+  </div>
+
+  <!-- FB vs Google by School -->
+  <div class="chart-grid chart-grid-2" style="margin-bottom:24px">
+    <div class="chart-card">
+      <div class="chart-card-header"><div>
+        <div class="chart-card-title" style="color:var(--accent2)">Hebrew School — FB vs Google</div>
+        <div class="chart-card-sub">April 2026 channel performance for Hebrew</div>
+      </div></div>
+      <div id="aprMediaHeb" style="padding:0 4px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-header"><div>
+        <div class="chart-card-title" style="color:var(--green2)">Biblical School — FB vs Google</div>
+        <div class="chart-card-sub">April 2026 channel performance for Biblical</div>
+      </div></div>
+      <div id="aprMediaBib" style="padding:0 4px"></div>
+    </div>
+  </div>
+
+  <!-- Campaign toggle -->
+  <div id="aprCampToggle" style="display:flex;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;width:fit-content;margin-bottom:20px">
+    <button class="camp-sort-btn active" style="padding:9px 18px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border:none;background:var(--card2);transition:0.2s" onclick="setAprView('bestRev',this)">Best by Revenue</button>
+    <button class="camp-sort-btn" style="padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;transition:0.2s" onclick="setAprView('bestRoi',this)">Best by ROI</button>
+    <button class="camp-sort-btn" style="padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;transition:0.2s" onclick="setAprView('worstRev',this)">Worst by Revenue</button>
+    <button class="camp-sort-btn" style="padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;transition:0.2s" onclick="setAprView('worstRoi',this)">Worst by ROI</button>
+    <button class="camp-sort-btn" style="padding:9px 18px;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:none;transition:0.2s" onclick="setAprView('zeroRev',this)">Zero Revenue</button>
+  </div>
+
+  <!-- Campaign table -->
+  <div class="chart-card" style="margin-bottom:24px">
+    <div id="aprCampHeader" style="padding:18px 22px 0"></div>
+    <div class="table-scroll" id="aprCampTable"></div>
+  </div>
+
+  <!-- Insights -->
+  <div class="chart-card" style="margin-bottom:0">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title">Diagnosis &amp; Recommendations</div>
+      <div class="chart-card-sub">Data-driven analysis of April underperformance</div>
+    </div></div>
+    <div id="aprInsights"></div>
+  </div>
+
+</div>
+</div>
+
 <div class="watermark">Campaign Intelligence Dashboard</div>
 
 <script>
@@ -493,6 +578,7 @@
 //  DATA & GLOBALS
 // ══════════════════════════════════════════
 let DATA = null;
+let APRIL = null;
 let charts = {};
 let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
 let campSchool = 'all';
@@ -591,14 +677,16 @@ function setCampSchool(school, btn) {
 //  BOOT
 // ══════════════════════════════════════════
 async function boot() {
-  const res = await fetch('./data.json');
-  DATA = await res.json();
+  const [res1, res2] = await Promise.all([fetch('./data.json'), fetch('./april_data.json')]);
+  DATA  = await res1.json();
+  APRIL = await res2.json();
   document.getElementById('dateRange').textContent = DATA.summary_v2.dateRange;
   buildOverview();
   buildHebrew();
   buildBiblical();
   buildTable('allTable', DATA.topCampaigns_v2.all.byRevenue);
   buildAnalysis();
+  buildApril();
 }
 
 // ══════════════════════════════════════════
@@ -1027,6 +1115,239 @@ function buildAnalysis() {
       </div>
     </div>
   `;
+}
+
+// ══════════════════════════════════════════
+//  APRIL DEEP-DIVE TAB
+// ══════════════════════════════════════════
+let aprView = 'bestRev';
+
+function setAprView(view, btn) {
+  aprView = view;
+  document.querySelectorAll('#aprCampToggle button').forEach(b => {
+    b.style.background = 'none'; b.style.color = 'var(--text2)';
+  });
+  btn.style.background = 'var(--card2)'; btn.style.color = 'var(--text)';
+  buildAprCampTable();
+}
+
+function buildApril() {
+  if (!APRIL) return;
+  const A = APRIL;
+  const y26 = A.yoy_compare.apr2026_12d;
+  const y25 = A.yoy_compare.apr2025_12d;
+  const y24 = A.yoy_compare.apr2024_12d;
+
+  // ─ KPI cards
+  const yoyRevPct = y25.revenue ? ((y26.revenue - y25.revenue) / y25.revenue * 100) : 0;
+  const yoyRoiPct = y25.roi ? ((y26.roi - y25.roi) / y25.roi * 100) : 0;
+  const fb = A.media_apr26.Facebook || {};
+  const gg = A.media_apr26.Google || {};
+  const kpiCards = [
+    { label:'April Revenue', value: fmt.$(y26.revenue), sub:`YoY: ${yoyRevPct>0?'+':''}${yoyRevPct.toFixed(0)}% vs 2025`, cls: yoyRevPct>0?'pos':'neg' },
+    { label:'April ROI', value: fmt.roi(y26.roi), sub:`2025: ${fmt.roi(y25.roi)} · 2024: ${fmt.roi(y24.roi)}`, cls: y26.roi>=1?'pos':'neg' },
+    { label:'Facebook ROI', value: fmt.roi(fb.roi), sub:`Rev: ${fmt.$(fb.revenue||0)} · Cost: ${fmt.$(fb.cost||0)}`, cls: (fb.roi||0)>=1?'pos':'neg' },
+    { label:'Google ROI', value: fmt.roi(gg.roi), sub:`Rev: ${fmt.$(gg.revenue||0)} · Cost: ${fmt.$(gg.cost||0)}`, cls: (gg.roi||0)>=1?'pos':'neg' },
+    { label:'Total Leads', value: y26.leads.toLocaleString(), sub:`FB: ${(fb.leads||0).toLocaleString()} · G: ${(gg.leads||0).toLocaleString()}`, cls:'neu' },
+    { label:'Orders', value: y26.orders.toLocaleString(), sub:`L→O: ${(y26.leadToOrder*100).toFixed(1)}%`, cls:'neu' },
+    { label:'Acquisitions', value: y26.acquisitions.toLocaleString(), sub:`L→A: ${(y26.leadToAcq*100).toFixed(1)}%`, cls:'neu' },
+    { label:'Avg CPL', value: '$'+y26.cpl.toFixed(0), sub:`FB: $${(fb.cpl||0).toFixed(0)} · G: $${(gg.cpl||0).toFixed(0)}`, cls: y26.cpl<50?'pos':'neg' },
+  ];
+  document.getElementById('aprKpis').innerHTML = kpiCards.map(k => {
+    const color = k.cls==='pos'?'var(--green2)':k.cls==='neg'?'#ef4444':'var(--text)';
+    return `<div class="kpi-card"><div class="kpi-value" style="color:${color}">${k.value}</div><div class="kpi-label">${k.label}</div><div class="kpi-sub">${k.sub}</div></div>`;
+  }).join('');
+
+  // ─ YoY bar chart
+  buildAprYoyChart(y24, y25, y26);
+  buildAprDailyChart();
+  buildAprMediaTable();
+  buildAprSchoolMedia();
+  buildAprCampTable();
+  buildAprInsights();
+}
+
+function buildAprYoyChart(y24, y25, y26) {
+  dc('aprYoy');
+  const ctx = document.getElementById('aprYoyChart').getContext('2d');
+  charts['aprYoy'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Revenue','Cost','Leads','Orders','Acquisitions'],
+      datasets:[
+        { label:'Apr 2024', data:[y24.revenue,y24.cost,y24.leads*50,y24.orders*500,y24.acquisitions*500], backgroundColor:'rgba(99,102,241,0.65)', borderColor:'#6366f1', borderWidth:1.5, borderRadius:6 },
+        { label:'Apr 2025', data:[y25.revenue,y25.cost,y25.leads*50,y25.orders*500,y25.acquisitions*500], backgroundColor:'rgba(245,158,11,0.55)', borderColor:'#f59e0b', borderWidth:1.5, borderRadius:6 },
+        { label:'Apr 2026', data:[y26.revenue,y26.cost,y26.leads*50,y26.orders*500,y26.acquisitions*500], backgroundColor:'rgba(239,68,68,0.60)', borderColor:'#ef4444', borderWidth:1.5, borderRadius:6 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ labels:{color:'#9999b0',font:{size:11}} },
+        tooltip:{ ...TT, callbacks:{ label:c=>{
+          const i = c.dataIndex;
+          const raw = [c.dataset.data[0], c.dataset.data[1], c.dataset.data[2]/50, c.dataset.data[3]/500, c.dataset.data[4]/500];
+          const labels = ['Revenue','Cost','Leads','Orders','Acquisitions'];
+          const v = raw[i];
+          return ` ${c.dataset.label}: ${i<2 ? '$'+v.toLocaleString(undefined,{maximumFractionDigits:0}) : v.toLocaleString()}`;
+        }}}
+      },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:'#9999b0'} },
+        y:{ grid:{color:gc}, ticks:{color:'#666688',callback:v=>'$'+((v/1000).toFixed(0))+'K'} }
+      }
+    }
+  });
+}
+
+function buildAprDailyChart() {
+  dc('aprDaily');
+  const daily = APRIL.daily_trend;
+  const dates = [...new Set(daily.map(d=>d.date))].sort();
+  const fbData = dates.map(dt => {
+    const r = daily.find(d => d.date===dt && d.media==='Facebook');
+    return r ? r.revenue : 0;
+  });
+  const ggData = dates.map(dt => {
+    const r = daily.find(d => d.date===dt && d.media==='Google');
+    return r ? r.revenue : 0;
+  });
+  const labels = dates.map(d => { const dt=new Date(d); return dt.toLocaleDateString('en',{month:'short',day:'numeric'}); });
+  const ctx = document.getElementById('aprDailyChart').getContext('2d');
+  charts['aprDaily'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:'Facebook', data:fbData, backgroundColor:'rgba(99,102,241,0.65)', borderColor:'#6366f1', borderWidth:1, borderRadius:4 },
+        { label:'Google', data:ggData, backgroundColor:'rgba(16,185,129,0.60)', borderColor:'#10b981', borderWidth:1, borderRadius:4 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ labels:{color:'#9999b0',font:{size:11}} },
+        tooltip:{ ...TT, callbacks:{ label:c=>` ${c.dataset.label}: $${c.parsed.y.toLocaleString(undefined,{maximumFractionDigits:0})}` } }
+      },
+      scales:{
+        x:{ stacked:true, grid:{display:false}, ticks:{color:'#9999b0',font:{size:10}} },
+        y:{ stacked:true, grid:{color:gc}, ticks:{color:'#666688',callback:v=>'$'+(v/1000).toFixed(0)+'K'} }
+      }
+    }
+  });
+}
+
+function buildAprMediaTable() {
+  const fb = APRIL.media_apr26.Facebook || {};
+  const gg = APRIL.media_apr26.Google || {};
+  const metrics = [
+    { label:'Revenue', fb:fmt.$(fb.revenue||0), gg:fmt.$(gg.revenue||0), winner:(fb.revenue||0)>(gg.revenue||0)?'fb':'gg' },
+    { label:'Ad Spend', fb:fmt.$(fb.cost||0), gg:fmt.$(gg.cost||0), winner:(fb.cost||0)<(gg.cost||0)?'fb':'gg' },
+    { label:'ROI', fb:fmt.roi(fb.roi), gg:fmt.roi(gg.roi), winner:(fb.roi||0)>(gg.roi||0)?'fb':'gg' },
+    { label:'Cost per Lead', fb:'$'+(fb.cpl||0).toFixed(2), gg:'$'+(gg.cpl||0).toFixed(2), winner:(fb.cpl||999)<(gg.cpl||999)?'fb':'gg' },
+    { label:'Leads', fb:(fb.leads||0).toLocaleString(), gg:(gg.leads||0).toLocaleString(), winner:(fb.leads||0)>(gg.leads||0)?'fb':'gg' },
+    { label:'Orders', fb:(fb.orders||0).toLocaleString(), gg:(gg.orders||0).toLocaleString(), winner:(fb.orders||0)>(gg.orders||0)?'fb':'gg' },
+    { label:'Acquisitions', fb:(fb.acquisitions||0).toLocaleString(), gg:(gg.acquisitions||0).toLocaleString(), winner:(fb.acquisitions||0)>(gg.acquisitions||0)?'fb':'gg' },
+    { label:'Lead → Order %', fb:((fb.leadToOrder||0)*100).toFixed(2)+'%', gg:((gg.leadToOrder||0)*100).toFixed(2)+'%', winner:(fb.leadToOrder||0)>(gg.leadToOrder||0)?'fb':'gg' },
+    { label:'Lead → Acq %', fb:((fb.leadToAcq||0)*100).toFixed(2)+'%', gg:((gg.leadToAcq||0)*100).toFixed(2)+'%', winner:(fb.leadToAcq||0)>(gg.leadToAcq||0)?'fb':'gg' },
+    { label:'Impressions', fb:(fb.impressions||0).toLocaleString(), gg:(gg.impressions||0).toLocaleString(), winner:(fb.impressions||0)>(gg.impressions||0)?'fb':'gg' },
+  ];
+  const rows = metrics.map(m => {
+    const fbStyle = m.winner==='fb' ? 'color:var(--green2);font-weight:700' : 'color:var(--text2)';
+    const ggStyle = m.winner==='gg' ? 'color:var(--green2);font-weight:700' : 'color:var(--text2)';
+    return `<tr><td style="font-weight:600;color:var(--text)">${m.label}</td><td style="${fbStyle}">${m.fb}</td><td style="${ggStyle}">${m.gg}</td></tr>`;
+  }).join('');
+  document.getElementById('aprMediaTable').innerHTML = `<table class="camp-table" style="width:100%">
+    <thead><tr><th>Metric</th><th style="color:#6366f1">Facebook</th><th style="color:#10b981">Google</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function buildAprSchoolMedia() {
+  const renderBlock = (data, elId) => {
+    const fb = data.Facebook || {};
+    const gg = data.Google || {};
+    if (!fb.revenue && !gg.revenue) { document.getElementById(elId).innerHTML='<div style="padding:16px;color:var(--text2);font-size:13px">No data</div>'; return; }
+    const rows = [
+      ['Revenue', fmt.$(fb.revenue||0), fmt.$(gg.revenue||0)],
+      ['ROI', fmt.roi(fb.roi), fmt.roi(gg.roi)],
+      ['CPL', '$'+(fb.cpl||0).toFixed(0), '$'+(gg.cpl||0).toFixed(0)],
+      ['Leads', (fb.leads||0).toLocaleString(), (gg.leads||0).toLocaleString()],
+      ['Orders', (fb.orders||0).toLocaleString(), (gg.orders||0).toLocaleString()],
+      ['Acquisitions', (fb.acquisitions||0).toLocaleString(), (gg.acquisitions||0).toLocaleString()],
+    ].map(([l,f,g]) => `<tr><td style="font-weight:600;color:var(--text);font-size:12px">${l}</td><td style="font-size:12px;color:var(--text2)">${f}</td><td style="font-size:12px;color:var(--text2)">${g}</td></tr>`).join('');
+    document.getElementById(elId).innerHTML = `<table class="camp-table" style="width:100%;font-size:12px">
+      <thead><tr><th style="font-size:10px">Metric</th><th style="font-size:10px;color:#6366f1">Facebook</th><th style="font-size:10px;color:#10b981">Google</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  };
+  renderBlock(APRIL.media_apr26_heb, 'aprMediaHeb');
+  renderBlock(APRIL.media_apr26_bib, 'aprMediaBib');
+}
+
+function buildAprCampTable() {
+  const views = {
+    bestRev:  { data: APRIL.best_revenue,  title:'Top Campaigns by Revenue', sub:'Highest revenue generators in April 2026 (min $50 spend)' },
+    bestRoi:  { data: APRIL.best_roi,      title:'Top Campaigns by ROI', sub:'Highest ROI in April 2026 (min $200 spend)' },
+    worstRev: { data: APRIL.worst_revenue,  title:'Lowest Revenue Campaigns', sub:'Lowest revenue with active spend in April 2026' },
+    worstRoi: { data: APRIL.worst_roi,      title:'Lowest ROI Campaigns', sub:'Worst ROI in April 2026 (min $200 spend)' },
+    zeroRev:  { data: APRIL.zero_revenue,   title:'Zero Revenue — Money Burned', sub:'Campaigns with $50+ spend but $0 revenue in April 2026' },
+  };
+  const v = views[aprView] || views.bestRev;
+  document.getElementById('aprCampHeader').innerHTML = `<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">${v.title}</div><div style="font-size:12px;color:var(--text2);margin-bottom:12px">${v.sub}</div>`;
+  
+  const isWorst = aprView.startsWith('worst') || aprView === 'zeroRev';
+  const roiColor = val => val >= 2 ? 'var(--green2)' : val >= 1 ? 'var(--amber2)' : '#ef4444';
+  
+  const rows = v.data.map(c => {
+    const mediaDot = c.media==='Facebook' ? '#6366f1' : c.media==='Google' ? '#10b981' : 'var(--text2)';
+    return `<tr>
+      <td style="font-weight:600;color:var(--text);white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${mediaDot};margin-right:6px"></span>${c.campaign}</td>
+      <td style="color:var(--text2)">${c.media}</td>
+      <td style="font-size:11px;color:var(--text2)">${c.category.replace(' Related','')}</td>
+      <td style="font-weight:700;color:${isWorst?'#ef4444':'var(--green2)'}">${fmt.$(c.revenue)}</td>
+      <td style="color:var(--text2)">${fmt.$(c.cost)}</td>
+      <td style="font-weight:700;color:${roiColor(c.roi)}">${fmt.roi(c.roi)}</td>
+      <td style="color:var(--text2)">${c.leads.toLocaleString()}</td>
+      <td style="color:var(--text2)">${c.orders}</td>
+      <td style="color:var(--text2)">${c.acquisitions}</td>
+      <td style="color:var(--text2)">$${c.cpl.toFixed(0)}</td>
+      <td style="color:var(--text2)">${(c.contactRate*100).toFixed(0)}%</td>
+      <td style="color:var(--text2)">${c.days}d</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('aprCampTable').innerHTML = `<table class="camp-table" style="width:100%">
+    <thead><tr>
+      <th>Campaign</th><th>Channel</th><th>School</th><th>Revenue</th><th>Cost</th><th>ROI</th><th>Leads</th><th>Orders</th><th>Acq</th><th>CPL</th><th>Contact %</th><th>Days</th>
+    </tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function buildAprInsights() {
+  const A = APRIL;
+  const y26 = A.yoy_compare.apr2026_12d;
+  const y25 = A.yoy_compare.apr2025_12d;
+  const y24 = A.yoy_compare.apr2024_12d;
+  const fb = A.media_apr26.Facebook || {};
+  const gg = A.media_apr26.Google || {};
+
+  const fbCostShare = fb.cost / (fb.cost + gg.cost) * 100;
+  const fbRevShare  = fb.revenue / ((fb.revenue||0) + (gg.revenue||0)) * 100;
+
+  const insights = [
+    { icon:'🚨', text:`<strong>April 2026 ROI is 0.66x — losing $0.34 on every dollar spent.</strong> Revenue is $69K against $105K in ad spend (Apr 1–12). This is a 28% deterioration vs. 2024 (0.92x) for the same window. The bleed is real and accelerating.` },
+    { icon:'📱', text:`<strong>Facebook is the primary drag: ROI 0.51x</strong> — spending $83.7K to generate only $43K in revenue. Facebook absorbs ${fbCostShare.toFixed(0)}% of budget but delivers only ${fbRevShare.toFixed(0)}% of revenue. Every $1 on Facebook returns $0.51.` },
+    { icon:'✅', text:`<strong>Google is profitable at 1.24x ROI</strong> — $21K spend producing $26K revenue. Google has a much higher lead-to-order rate (${((gg.leadToOrder||0)*100).toFixed(1)}% vs Facebook\'s ${((fb.leadToOrder||0)*100).toFixed(1)}%) despite higher CPL ($${(gg.cpl||0).toFixed(0)} vs $${(fb.cpl||0).toFixed(0)}). Google leads convert better.` },
+    { icon:'💰', text:`<strong>Facebook CPL looks cheap ($${(fb.cpl||0).toFixed(0)}) but produces low-quality leads.</strong> Facebook generates ${(fb.leads||0).toLocaleString()} leads vs Google\'s ${(gg.leads||0).toLocaleString()}, but the conversion to orders is dramatically worse. Volume without quality is pure cost.` },
+    { icon:'📉', text:`<strong>Year-over-year decline is structural, not seasonal.</strong> Apr 2024: $94K revenue / 0.92x ROI → Apr 2025: $58K / 0.55x → Apr 2026: $69K / 0.66x. Revenue improved slightly from the 2025 trough but ROI remains far below breakeven. The cost base has grown faster than revenue.` },
+    { icon:'🛠', text:`<strong>Recommended actions:</strong> (1) Cut Facebook daily budget by 30–40% immediately — redirect to Google. (2) Pause all zero-revenue Facebook campaigns identified in this tab. (3) Test new Facebook creatives on a small budget before scaling. (4) Double down on top-performing Google campaigns showing >1.5x ROI. (5) Investigate whether the Passover / Easter holiday window is suppressing conversions.` },
+  ];
+
+  document.getElementById('aprInsights').innerHTML = insights.map(ins =>
+    `<div style="display:flex;gap:13px;padding:13px 20px;border-bottom:1px solid var(--border);align-items:flex-start">
+      <div style="font-size:18px;flex-shrink:0;margin-top:1px">${ins.icon}</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">${ins.text}</div>
+    </div>`
+  ).join('');
 }
 
 boot();
