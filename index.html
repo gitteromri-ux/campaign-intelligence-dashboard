@@ -559,6 +559,42 @@
     <div class="table-scroll" id="aprCampTable"></div>
   </div>
 
+  <!-- Action Plan -->
+  <div class="chart-card" style="margin-bottom:24px;border:1px solid rgba(239,68,68,0.25)">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title" style="color:#ef4444">🚨 Stop Immediately — Zero Revenue Campaigns</div>
+      <div class="chart-card-sub">These campaigns have been running all of April with $0 revenue — pure cash burn</div>
+    </div></div>
+    <div class="table-scroll" id="recTier1Table"></div>
+    <div id="recTier1Summary" style="padding:10px 20px 16px"></div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px;border:1px solid rgba(245,158,11,0.25)">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title" style="color:#f59e0b">⚠️ Stop or Cut — Severe Loss (ROI &lt; 0.3x)</div>
+      <div class="chart-card-sub">Returning less than 30 cents per dollar — not recoverable in current form</div>
+    </div></div>
+    <div class="table-scroll" id="recTier2Table"></div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px;border:1px solid rgba(245,158,11,0.15)">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title" style="color:#fbbf24">⏸ Pause &amp; Review — Biggest Money Pits (ROI 0.3–0.7x)</div>
+      <div class="chart-card-sub">Generating some revenue but losing significant money — needs creative/audience overhaul</div>
+    </div></div>
+    <div class="table-scroll" id="recTier3Table"></div>
+    <div id="recTier3Summary" style="padding:10px 20px 16px"></div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px;border:1px solid rgba(16,185,129,0.25)">
+    <div class="chart-card-header"><div>
+      <div class="chart-card-title" style="color:#10b981">✅ Scale Up — Profitable Campaigns (ROI &gt; 1.5x)</div>
+      <div class="chart-card-sub">Redirect budget from stopped campaigns here — these are actually working</div>
+    </div></div>
+    <div class="table-scroll" id="recScaleTable"></div>
+    <div id="recScaleSummary" style="padding:10px 20px 16px"></div>
+  </div>
+
   <!-- Insights -->
   <div class="chart-card" style="margin-bottom:0">
     <div class="chart-card-header"><div>
@@ -1164,6 +1200,7 @@ function buildApril() {
   buildAprMediaTable();
   buildAprSchoolMedia();
   buildAprCampTable();
+  buildAprRecs();
   buildAprInsights();
 }
 
@@ -1348,6 +1385,70 @@ function buildAprInsights() {
       <div style="font-size:13px;color:var(--text2);line-height:1.6">${ins.text}</div>
     </div>`
   ).join('');
+}
+
+function buildAprRecs() {
+  if (!APRIL || !APRIL.recommendations) return;
+  const R = APRIL.recommendations;
+
+  const recRow = (c, isLoss) => {
+    const mediaDot = c.media==='Facebook' ? '#6366f1' : '#10b981';
+    const roiCol = c.roi >= 1.5 ? 'var(--green2)' : c.roi >= 1 ? 'var(--amber2)' : '#ef4444';
+    const revCol = isLoss ? '#ef4444' : 'var(--green2)';
+    const lossCell = isLoss ? `<td style="font-weight:700;color:#ef4444">-${fmt.$(Math.abs(c.loss))}</td>` : '';
+    return `<tr>
+      <td style="font-weight:600;color:var(--text);white-space:nowrap"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${mediaDot};margin-right:6px"></span>${c.campaign}</td>
+      <td style="color:var(--text2)">${c.media}</td>
+      <td style="font-size:11px;color:var(--text2)">${c.category.replace(' Related','')}</td>
+      <td style="font-weight:700;color:${revCol}">${fmt.$(c.revenue)}</td>
+      <td style="color:var(--text2)">${fmt.$(c.cost)}</td>
+      <td style="font-weight:700;color:${roiCol}">${fmt.roi(c.roi)}</td>
+      ${lossCell}
+      <td style="color:var(--text2)">${c.leads.toLocaleString()}</td>
+      <td style="color:var(--text2)">${c.orders}</td>
+      <td style="color:var(--text2)">${c.acquisitions}</td>
+      <td style="color:var(--text2)">$${c.cpl.toFixed(0)}</td>
+      <td style="color:var(--text2)">${c.days}d</td>
+    </tr>`;
+  };
+
+  const lossHead = '<th style="color:#ef4444">Loss</th>';
+  const headRow = (withLoss) => `<thead><tr><th>Campaign</th><th>Channel</th><th>School</th><th>Revenue</th><th>Cost</th><th>ROI</th>${withLoss?lossHead:''}<th>Leads</th><th>Orders</th><th>Acq</th><th>CPL</th><th>Days</th></tr></thead>`;
+
+  // Tier 1
+  if (R.tier1_stop.length) {
+    document.getElementById('recTier1Table').innerHTML = `<table class="camp-table" style="width:100%">${headRow(true)}<tbody>${R.tier1_stop.map(c=>recRow(c,true)).join('')}</tbody></table>`;
+    document.getElementById('recTier1Summary').innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:10px 16px;font-size:13px"><strong style="color:#ef4444">${R.tier1_stop.length} campaigns</strong><span style="color:var(--text2)"> burning </span><strong style="color:#ef4444">${fmt.$(R.total_tier1_waste)}</strong><span style="color:var(--text2)"> with zero return</span></div>
+      <div style="font-size:12px;color:var(--text2)">Action: Turn off today. No revenue impact since they produce $0.</div>
+    </div>`;
+  }
+
+  // Tier 2
+  if (R.tier2_stop.length) {
+    document.getElementById('recTier2Table').innerHTML = `<table class="camp-table" style="width:100%">${headRow(true)}<tbody>${R.tier2_stop.map(c=>recRow(c,true)).join('')}</tbody></table>`;
+  } else {
+    document.getElementById('recTier2Table').innerHTML = '<div style="padding:16px 20px;color:var(--text2);font-size:13px">No campaigns in this tier currently.</div>';
+  }
+
+  // Tier 3
+  if (R.tier3_pause.length) {
+    document.getElementById('recTier3Table').innerHTML = `<table class="camp-table" style="width:100%">${headRow(true)}<tbody>${R.tier3_pause.map(c=>recRow(c,true)).join('')}</tbody></table>`;
+    document.getElementById('recTier3Summary').innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 16px;font-size:13px"><strong style="color:#f59e0b">${R.tier3_pause.length} campaigns</strong><span style="color:var(--text2)"> losing </span><strong style="color:#f59e0b">${fmt.$(R.total_tier3_loss)}</strong><span style="color:var(--text2)"> combined</span></div>
+      <div style="font-size:12px;color:var(--text2)">Action: Pause, review creatives and audiences, relaunch only with new strategy.</div>
+    </div>`;
+  }
+
+  // Scale up
+  if (R.scale_up.length) {
+    document.getElementById('recScaleTable').innerHTML = `<table class="camp-table" style="width:100%">${headRow(false)}<tbody>${R.scale_up.map(c=>recRow(c,false)).join('')}</tbody></table>`;
+    const totalSavings = R.total_tier1_waste + R.total_tier2_loss;
+    document.getElementById('recScaleSummary').innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 16px;font-size:13px"><strong style="color:var(--green2)">${R.scale_up.length} campaigns</strong><span style="color:var(--text2)"> generating </span><strong style="color:var(--green2)">${fmt.$(R.total_scale_revenue)}</strong><span style="color:var(--text2)"> at avg ${(R.scale_up.reduce((a,c)=>a+c.roi,0)/R.scale_up.length).toFixed(1)}x ROI</span></div>
+      <div style="font-size:12px;color:var(--text2)">Action: Redirect the ~${fmt.$(totalSavings)} saved from Tier 1+2 into these campaigns.</div>
+    </div>`;
+  }
 }
 
 boot();
