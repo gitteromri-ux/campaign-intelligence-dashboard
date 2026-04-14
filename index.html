@@ -316,6 +316,7 @@
     <div class="main-tab" onclick="switchPage('campaigns',this)">Campaign Explorer</div>
     <div class="main-tab" onclick="switchPage('analysis',this)">Analysis &amp; Insights</div>
     <div class="main-tab" onclick="switchPage('april',this)">April Deep-Dive</div>
+    <div class="main-tab" onclick="switchPage('mix',this)">Media Mix Optimizer</div>
   </div>
 </nav>
 
@@ -635,6 +636,94 @@
 </div>
 </div>
 
+<!-- ══════════ MEDIA MIX OPTIMIZER ══════════ -->
+<div class="page" id="page-mix">
+<div class="content">
+  <div class="section-header">
+    <div class="school-badge all" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2)"><div class="school-dot" style="background:#a855f7"></div>Strategic Optimization</div>
+    <div class="section-title">Optimal Media Mix — Revenue Maximizer</div>
+    <div class="section-sub">Data-driven lead allocation to maximize revenue while maintaining realistic channel capacity constraints</div>
+  </div>
+
+  <!-- Key Finding Banner -->
+  <div id="mixBanner" style="background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(16,185,129,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:16px;padding:24px 32px;margin-bottom:28px"></div>
+
+  <!-- Scenario Comparison KPIs -->
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap" id="mixScenarioToggle">
+    <button class="date-preset active" onclick="setMixView('optimal',this)" style="font-size:12px;padding:7px 16px">Recommended Mix</button>
+    <button class="date-preset" onclick="setMixView('profit',this)" style="font-size:12px;padding:7px 16px">Max Profit Mix</button>
+    <button class="date-preset" onclick="setMixView('growth',this)" style="font-size:12px;padding:7px 16px">Growth Mix</button>
+    <button class="date-preset" onclick="setMixView('current',this)" style="font-size:12px;padding:7px 16px">Current Mix</button>
+  </div>
+
+  <div class="kpi-grid" id="mixKpis"></div>
+
+  <!-- Side by Side: Current vs Optimal Donut -->
+  <div class="chart-row" style="margin-top:28px">
+    <div class="chart-card">
+      <div class="chart-card-title">Current Lead Allocation</div>
+      <div class="chart-card-sub">Recent 5-month average — where leads come from today</div>
+      <div class="chart-wrap" style="height:320px"><canvas id="mixCurrentDonut"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title" id="mixTargetDonutTitle">Recommended Lead Allocation</div>
+      <div class="chart-card-sub" id="mixTargetDonutSub">Optimized for maximum revenue with realistic constraints</div>
+      <div class="chart-wrap" style="height:320px"><canvas id="mixTargetDonut"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Channel Efficiency Bar -->
+  <div class="chart-card" style="margin-top:28px">
+    <div class="chart-card-title">Revenue per Lead by Channel</div>
+    <div class="chart-card-sub">Higher = each lead from this channel generates more revenue. Paid channels show profit per lead in overlay.</div>
+    <div class="chart-wrap" style="height:340px"><canvas id="mixEffChart"></canvas></div>
+  </div>
+
+  <!-- Diminishing Returns -->
+  <div class="chart-row" style="margin-top:28px">
+    <div class="chart-card">
+      <div class="chart-card-title">Facebook — Diminishing Returns Curve</div>
+      <div class="chart-card-sub">Revenue per lead drops as volume increases (correlation: -0.63)</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="mixFbDim"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Google — Diminishing Returns Curve</div>
+      <div class="chart-card-sub">Revenue per lead drops as volume increases (correlation: -0.69)</div>
+      <div class="chart-wrap" style="height:280px"><canvas id="mixGgDim"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Detailed Mix Table -->
+  <div class="chart-card" style="margin-top:28px">
+    <div class="chart-card-title" id="mixTableTitle">Recommended Mix — Channel Breakdown</div>
+    <div class="chart-card-sub">Monthly lead targets with expected revenue and cost impact</div>
+    <div style="overflow-x:auto"><table class="camp-table" style="width:100%" id="mixTable"></table></div>
+  </div>
+
+  <!-- School-Level Efficiency -->
+  <div class="chart-row" style="margin-top:28px">
+    <div class="chart-card">
+      <div class="chart-card-title">Hebrew School — Channel Efficiency</div>
+      <div class="chart-card-sub">Revenue per lead and conversion rates by media channel</div>
+      <div style="overflow-x:auto" id="mixSchoolHeb"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Biblical School — Channel Efficiency</div>
+      <div class="chart-card-sub">Revenue per lead and conversion rates by media channel</div>
+      <div style="overflow-x:auto" id="mixSchoolBib"></div>
+    </div>
+  </div>
+
+  <!-- Action Plan -->
+  <div class="chart-card" style="margin-top:28px;margin-bottom:0">
+    <div class="chart-card-title">Implementation Action Plan</div>
+    <div class="chart-card-sub">Prioritized steps to transition from current to optimal mix</div>
+    <div id="mixActions"></div>
+  </div>
+
+</div>
+</div>
+
 <div class="watermark">Campaign Intelligence Dashboard</div>
 
 <script>
@@ -644,6 +733,8 @@
 let RAW = null;
 let DATA = null;
 let APRIL = null;
+let MIX = null;
+let mixView = 'optimal';
 let charts = {};
 let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
 let campSchool = 'all';
@@ -916,9 +1007,10 @@ function setCampSchool(school, btn) {
 //  BOOT
 // ══════════════════════════════════════════
 async function boot() {
-  const [res1, res2] = await Promise.all([fetch('./raw.json'), fetch('./april_data.json')]);
+  const [res1, res2, res3] = await Promise.all([fetch('./raw.json'), fetch('./april_data.json'), fetch('./mix_data.json')]);
   RAW   = await res1.json();
   APRIL = await res2.json();
+  MIX   = await res3.json();
 
   // Set date inputs to full range
   document.getElementById('dfStart').value = RAW.meta.minDate;
@@ -934,6 +1026,7 @@ async function boot() {
   buildTable('allTable', DATA.topCampaigns_v2.all.byRevenue);
   buildAnalysis();
   buildApril();
+  buildMix();
 }
 
 // ══════════════════════════════════════════
@@ -1655,6 +1748,302 @@ function buildAprRecs() {
       <div style="font-size:12px;color:var(--text2)">Action: Redirect the ~${fmt.$(totalSavings)} saved from Tier 1+2 into these campaigns.</div>
     </div>`;
   }
+}
+
+// ══════════════════════════════════════════
+//  MEDIA MIX OPTIMIZER TAB
+// ══════════════════════════════════════════
+const MIX_COLORS = ['#6366f1','#10b981','#f59e0b','#a855f7','#06b6d4','#ec4899','#ef4444','#818cf8'];
+
+function setMixView(view, btn) {
+  mixView = view;
+  document.querySelectorAll('#mixScenarioToggle .date-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildMixKpis();
+  buildMixTargetDonut();
+  buildMixTable();
+}
+
+function buildMix() {
+  if (!MIX) return;
+  buildMixBanner();
+  buildMixKpis();
+  buildMixCurrentDonut();
+  buildMixTargetDonut();
+  buildMixEffChart();
+  buildMixDimCharts();
+  buildMixTable();
+  buildMixSchoolTables();
+  buildMixActions();
+}
+
+function buildMixBanner() {
+  const K = MIX.key_findings;
+  document.getElementById('mixBanner').innerHTML = `
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+      <div style="flex:1;min-width:280px">
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Your Facebook leads lose $9.27 per lead. Fixing this alone unlocks +$71K/month in profit.</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">Facebook absorbs 39.5% of leads but produces <strong style="color:#ef4444">negative profit</strong> (-$21.7K/month). Both Facebook and Google show strong diminishing returns — more volume means worse economics. The optimal mix cuts Facebook by 30%, scales Google by 60%, and grows organic channels to achieve <strong style="color:var(--green2)">+${K.optimal_vs_current_rev_lift}% revenue</strong> and <strong style="color:var(--green2)">+${K.optimal_vs_current_profit_lift}% profit</strong> vs. current.</div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="text-align:center;padding:14px 20px;background:rgba(239,68,68,0.08);border-radius:12px;border:1px solid rgba(239,68,68,0.15)">
+          <div style="font-size:24px;font-weight:800;color:#ef4444">-$21.7K</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">FB monthly loss</div>
+        </div>
+        <div style="text-align:center;padding:14px 20px;background:rgba(16,185,129,0.08);border-radius:12px;border:1px solid rgba(16,185,129,0.15)">
+          <div style="font-size:24px;font-weight:800;color:var(--green2)">+$71K</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Monthly profit uplift</div>
+        </div>
+        <div style="text-align:center;padding:14px 20px;background:rgba(99,102,241,0.08);border-radius:12px;border:1px solid rgba(99,102,241,0.15)">
+          <div style="font-size:24px;font-weight:800;color:var(--accent2)">+$51K</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Monthly rev uplift</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getMixData() {
+  if (mixView === 'optimal') return MIX.optimal_mix;
+  if (mixView === 'profit') return MIX.profit_max_mix;
+  if (mixView === 'growth') return MIX.growth_mix;
+  return MIX.current_mix;
+}
+function getMixLabel() {
+  if (mixView === 'optimal') return 'Recommended';
+  if (mixView === 'profit') return 'Max Profit';
+  if (mixView === 'growth') return 'Growth';
+  return 'Current';
+}
+
+function buildMixKpis() {
+  const m = getMixData();
+  const c = MIX.current_mix;
+  const revDelta = ((m.total_revenue - c.total_revenue) / c.total_revenue * 100).toFixed(1);
+  const profDelta = ((m.total_profit - c.total_profit) / c.total_profit * 100).toFixed(1);
+  const costDelta = ((m.total_cost - c.total_cost) / c.total_cost * 100).toFixed(1);
+  const revColor = m.total_revenue >= c.total_revenue ? 'var(--green2)' : '#ef4444';
+  const profColor = m.total_profit >= c.total_profit ? 'var(--green2)' : '#ef4444';
+
+  document.getElementById('mixKpis').innerHTML = `
+    <div class="kpi-card accent"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${fmt.$(m.total_revenue)}</div><div class="kpi-sub"><span style="color:${revColor}">${revDelta > 0 ? '+' : ''}${revDelta}% vs current</span></div></div>
+    <div class="kpi-card green"><div class="kpi-label">Monthly Profit</div><div class="kpi-value">${fmt.$(m.total_profit)}</div><div class="kpi-sub"><span style="color:${profColor}">${profDelta > 0 ? '+' : ''}${profDelta}% vs current</span></div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Portfolio ROI</div><div class="kpi-value">${m.roi.toFixed(2)}x</div><div class="kpi-sub">Current: ${c.roi.toFixed(2)}x</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Rev per Lead</div><div class="kpi-value">$${m.blended_rpl.toFixed(0)}</div><div class="kpi-sub">Current: $${c.blended_rpl.toFixed(0)}</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Monthly Leads</div><div class="kpi-value">${m.total_leads.toLocaleString()}</div><div class="kpi-sub">Current: ${c.total_leads.toLocaleString()}</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Monthly Ad Spend</div><div class="kpi-value">${fmt.$(m.total_cost)}</div><div class="kpi-sub">${costDelta > 0 ? '+' : ''}${costDelta}% vs current</div></div>
+  `;
+}
+
+function buildMixCurrentDonut() {
+  dc('mixCurDonut');
+  const ch = MIX.current_mix.channels;
+  const ctx = document.getElementById('mixCurrentDonut').getContext('2d');
+  charts['mixCurDonut'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ch.map(c => c.name),
+      datasets: [{ data: ch.map(c => c.leads), backgroundColor: MIX_COLORS, borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: {
+        legend: { display: true, position: 'right', labels: { color: '#9999b0', font: { size: 11 }, padding: 10, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { ...TT, callbacks: { label: c => ` ${c.label}: ${c.parsed.toLocaleString()} leads (${(c.parsed / MIX.current_mix.total_leads * 100).toFixed(1)}%)` } }
+      }
+    }
+  });
+}
+
+function buildMixTargetDonut() {
+  dc('mixTgtDonut');
+  const m = getMixData();
+  const label = getMixLabel();
+  document.getElementById('mixTargetDonutTitle').textContent = label + ' Lead Allocation';
+  const subMap = { optimal: 'Optimized for maximum revenue with realistic constraints', profit: 'Maximizes profit by minimizing paid media waste', growth: 'Scales total leads aggressively while maintaining paid efficiency', current: 'Current allocation for comparison' };
+  document.getElementById('mixTargetDonutSub').textContent = subMap[mixView] || '';
+  const ch = m.channels;
+  const ctx = document.getElementById('mixTargetDonut').getContext('2d');
+  charts['mixTgtDonut'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ch.map(c => c.name),
+      datasets: [{ data: ch.map(c => c.leads), backgroundColor: MIX_COLORS, borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: {
+        legend: { display: true, position: 'right', labels: { color: '#9999b0', font: { size: 11 }, padding: 10, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { ...TT, callbacks: { label: c => ` ${c.label}: ${c.parsed.toLocaleString()} leads (${(c.parsed / m.total_leads * 100).toFixed(1)}%)` } }
+      }
+    }
+  });
+}
+
+function buildMixEffChart() {
+  dc('mixEff');
+  const E = MIX.channel_efficiency;
+  const ctx = document.getElementById('mixEffChart').getContext('2d');
+  charts['mixEff'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: E.labels,
+      datasets: [
+        { label: 'Revenue / Lead', data: E.rev_per_lead, backgroundColor: MIX_COLORS.map(c => c + 'cc'), borderRadius: 8, borderWidth: 0, order: 1 },
+        { label: 'Profit / Lead', data: E.profit_per_lead, backgroundColor: E.profit_per_lead.map(v => v >= 0 ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'), borderRadius: 8, borderWidth: 0, order: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#9999b0', usePointStyle: true, pointStyle: 'rect', boxWidth: 10 } },
+        tooltip: { ...TT, callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.y.toFixed(2)}` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9999b0', font: { size: 11 } } },
+        y: { grid: { color: gc }, ticks: { color: '#666688', callback: v => '$' + v } }
+      }
+    }
+  });
+}
+
+function buildMixDimCharts() {
+  // Facebook
+  dc('mixFbDim');
+  const fb = MIX.diminishing_returns.facebook;
+  const ctx1 = document.getElementById('mixFbDim').getContext('2d');
+  charts['mixFbDim'] = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: fb.quartiles,
+      datasets: [{ data: fb.rpl, backgroundColor: ['#6366f1','#818cf8','#c4b5fd','#ef4444'], borderRadius: 8, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: c => ` Rev/Lead: $${c.parsed.y.toFixed(2)} (avg ${fb.leads[c.dataIndex].toLocaleString()} leads/mo)` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9999b0', font: { size: 10 } } },
+        y: { grid: { color: gc }, ticks: { color: '#666688', callback: v => '$' + v }, beginAtZero: true }
+      }
+    }
+  });
+
+  // Google
+  dc('mixGgDim');
+  const gg = MIX.diminishing_returns.google;
+  const ctx2 = document.getElementById('mixGgDim').getContext('2d');
+  charts['mixGgDim'] = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: gg.quartiles,
+      datasets: [{ data: gg.rpl, backgroundColor: ['#10b981','#34d399','#a7f3d0','#ef4444'], borderRadius: 8, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: c => ` Rev/Lead: $${c.parsed.y.toFixed(2)} (avg ${gg.leads[c.dataIndex].toLocaleString()} leads/mo)` } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9999b0', font: { size: 10 } } },
+        y: { grid: { color: gc }, ticks: { color: '#666688', callback: v => '$' + v }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function buildMixTable() {
+  const m = getMixData();
+  const c = MIX.current_mix;
+  const label = getMixLabel();
+  document.getElementById('mixTableTitle').textContent = label + ' Mix \u2014 Channel Breakdown';
+
+  const findCurrent = name => c.channels.find(ch => ch.name === name) || { leads: 0, revenue: 0, cost: 0, profit: 0 };
+
+  const rows = m.channels.map(ch => {
+    const cur = findCurrent(ch.name);
+    const leadDelta = ch.leads - cur.leads;
+    const deltaStr = leadDelta === 0 ? '<span style="color:var(--text2)">\u2014</span>' : leadDelta > 0 ? `<span style="color:var(--green2)">+${leadDelta.toLocaleString()}</span>` : `<span style="color:#ef4444">${leadDelta.toLocaleString()}</span>`;
+    const roiStr = ch.roi ? `<span style="color:${ch.roi >= 1.2 ? 'var(--green2)' : ch.roi >= 1 ? 'var(--amber2)' : '#ef4444'}">${ch.roi.toFixed(2)}x</span>` : '<span style="color:var(--green2)">\u221E (organic)</span>';
+    const profColor = ch.profit >= 0 ? 'var(--green2)' : '#ef4444';
+
+    return `<tr>
+      <td style="font-weight:700;color:var(--text)">${ch.name}</td>
+      <td style="font-weight:600">${ch.leads.toLocaleString()}</td>
+      <td>${ch.pct.toFixed(1)}%</td>
+      <td>${deltaStr}</td>
+      <td>$${ch.rpl}</td>
+      <td style="font-weight:700;color:var(--text)">${fmt.$(ch.revenue)}</td>
+      <td>${ch.cost > 0 ? fmt.$(ch.cost) : '$0'}</td>
+      <td style="font-weight:700;color:${profColor}">${ch.profit >= 0 ? '+' : ''}${fmt.$(ch.profit)}</td>
+      <td>${roiStr}</td>
+    </tr>`;
+  }).join('');
+
+  const totalProfColor = m.total_profit >= 0 ? 'var(--green2)' : '#ef4444';
+  document.getElementById('mixTable').innerHTML = `
+    <thead><tr>
+      <th>Channel</th><th>Leads/Mo</th><th>Share</th><th>vs Current</th><th>Rev/Lead</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>ROI</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr style="border-top:2px solid var(--border2);font-weight:800">
+      <td style="color:var(--text)">TOTAL</td>
+      <td>${m.total_leads.toLocaleString()}</td>
+      <td>100%</td>
+      <td>${m.total_leads - c.total_leads > 0 ? '+' : ''}${(m.total_leads - c.total_leads).toLocaleString()}</td>
+      <td>$${m.blended_rpl.toFixed(0)}</td>
+      <td style="color:var(--text)">${fmt.$(m.total_revenue)}</td>
+      <td>${fmt.$(m.total_cost)}</td>
+      <td style="color:${totalProfColor}">${fmt.$(m.total_profit)}</td>
+      <td style="color:var(--green2)">${m.roi.toFixed(2)}x</td>
+    </tr></tfoot>
+  `;
+}
+
+function buildMixSchoolTables() {
+  const renderSchool = (data, elId, color) => {
+    const rows = data.map(ch => {
+      const pplColor = ch.ppl >= 0 ? 'var(--green2)' : '#ef4444';
+      return `<tr>
+        <td style="font-weight:600;color:var(--text)">${ch.name}</td>
+        <td style="font-weight:700;color:${color}">$${ch.rpl.toFixed(0)}</td>
+        <td style="color:${pplColor}">$${ch.ppl.toFixed(0)}</td>
+        <td>${ch.lead_pct.toFixed(1)}%</td>
+        <td>${ch.order_rate.toFixed(1)}%</td>
+        <td>${ch.acq_rate.toFixed(1)}%</td>
+      </tr>`;
+    }).join('');
+    document.getElementById(elId).innerHTML = `<table class="camp-table" style="width:100%">
+      <thead><tr><th>Channel</th><th>Rev/Lead</th><th>Profit/Lead</th><th>Lead %</th><th>Order Rate</th><th>Acq Rate</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  };
+  renderSchool(MIX.school_efficiency.hebrew, 'mixSchoolHeb', '#6366f1');
+  renderSchool(MIX.school_efficiency.biblical, 'mixSchoolBib', '#10b981');
+}
+
+function buildMixActions() {
+  const actions = [
+    { priority: 'high', icon: '\ud83d\udea8', title: 'Cut Facebook Lead Volume by 30%', desc: 'Reduce from ~3,100 to ~2,200 leads/month by pausing the worst-performing campaigns identified in the April Deep-Dive. This alone eliminates $21.7K/month in losses. At lower volume, remaining FB leads yield $52/lead instead of $44/lead.', impact: 'Saves $21.7K/month in losses + improves FB rev/lead by 18%' },
+    { priority: 'high', icon: '\ud83d\ude80', title: 'Scale Google Ads by 60%', desc: 'Increase from ~870 to ~1,400 leads/month. Google shows strong efficiency at this volume tier ($60/lead). Focus budget on Hebrew campaigns where Google ROI is 1.40x. Hebrew Google leads produce $98.50/lead vs Facebook at $78.12/lead.', impact: '+$14.4K monthly revenue at 1.22x ROI' },
+    { priority: 'high', icon: '\ud83d\udce7', title: 'Grow Email Marketing List 15%', desc: 'Increase from 2,600 to 3,000 leads/month through: (1) improved lead capture forms, (2) reactivation sequences for dormant subscribers, (3) cross-school email campaigns. Email is pure profit at $38/lead with zero media cost.', impact: '+$15.2K monthly revenue at infinite ROI' },
+    { priority: 'med', icon: '\ud83e\udd1d', title: 'Build Affiliate & Community Programs', desc: 'Scale affiliates from 120 to 300/month and community from 160 to 250/month. These organic channels produce $70-78/lead with zero cost. Partner with language learning influencers and create referral incentives for existing students.', impact: '+$19.4K monthly revenue at infinite ROI' },
+    { priority: 'med', icon: '\ud83c\udf10', title: 'Increase Web Campaign Capture', desc: 'Grow from 50 to 200 leads/month through SEO, landing page optimization, and content marketing. Web Campaign leads are the second-highest value at $100/lead. Invest in organic search for high-intent Hebrew and Biblical learning keywords.', impact: '+$15K monthly revenue at infinite ROI' },
+    { priority: 'low', icon: '\ud83d\udcca', title: 'Monitor and Adjust Monthly', desc: 'Track revenue per lead by channel monthly. If Facebook efficiency drops below $40/lead at 2,200 volume, cut further. If Google maintains $60+/lead at 1,400, test scaling to 1,600. Organic channels should be reviewed quarterly for growth capacity.', impact: 'Continuous optimization loop' },
+  ];
+
+  document.getElementById('mixActions').innerHTML = actions.map(a => {
+    const prioColor = a.priority === 'high' ? '#ef4444' : a.priority === 'med' ? '#f59e0b' : '#06b6d4';
+    const prioBg = a.priority === 'high' ? 'rgba(239,68,68,0.08)' : a.priority === 'med' ? 'rgba(245,158,11,0.08)' : 'rgba(6,182,212,0.08)';
+    const prioLabel = a.priority === 'high' ? 'IMMEDIATE' : a.priority === 'med' ? 'MEDIUM TERM' : 'ONGOING';
+    return `<div style="display:flex;gap:16px;padding:20px;border-bottom:1px solid var(--border);align-items:flex-start">
+      <div style="font-size:24px;flex-shrink:0">${a.icon}</div>
+      <div style="flex:1">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+          <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:${prioBg};color:${prioColor};border:1px solid ${prioColor}22">${prioLabel}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text)">${a.title}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:6px">${a.desc}</div>
+        <div style="font-size:12px;color:var(--green2);font-weight:600">${a.impact}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 boot();
