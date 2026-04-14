@@ -643,6 +643,7 @@
     <div class="school-badge all" style="background:rgba(168,85,247,0.1);border-color:rgba(168,85,247,0.2)"><div class="school-dot" style="background:#a855f7"></div>Strategic Optimization</div>
     <div class="section-title">Optimal Media Mix — Revenue Maximizer</div>
     <div class="section-sub">Data-driven lead allocation to maximize revenue while maintaining realistic channel capacity constraints</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:4px;opacity:0.7">Current mix = actual monthly average from Nov 2025 – Mar 2026 (most recent 5 complete months). Scenarios use diminishing returns curves derived from historical data.</div>
   </div>
 
   <!-- Key Finding Banner -->
@@ -1779,23 +1780,28 @@ function buildMix() {
 
 function buildMixBanner() {
   const K = MIX.key_findings;
+  const cur = MIX.current_mix;
+  const opt = MIX.optimal_mix;
+  const fbCh = cur.channels.find(c => c.name === 'Facebook') || {};
+  const profitUplift = opt.total_profit - cur.total_profit;
+  const revUplift = opt.total_revenue - cur.total_revenue;
   document.getElementById('mixBanner').innerHTML = `
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
       <div style="flex:1;min-width:280px">
-        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Your Facebook leads lose $9.27 per lead. Fixing this alone unlocks +$71K/month in profit.</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">Facebook absorbs 39.5% of leads but produces <strong style="color:#ef4444">negative profit</strong> (-$21.7K/month). Both Facebook and Google show strong diminishing returns — more volume means worse economics. The optimal mix cuts Facebook by 30%, scales Google by 60%, and grows organic channels to achieve <strong style="color:var(--green2)">+${K.optimal_vs_current_rev_lift}% revenue</strong> and <strong style="color:var(--green2)">+${K.optimal_vs_current_profit_lift}% profit</strong> vs. current.</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Facebook loses ${fmt.$(Math.abs(fbCh.profit||0))}/month. Fixing this unlocks +${fmt.$(profitUplift)} in monthly profit.</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">Facebook absorbs ${fbCh.pct||0}% of leads but produces <strong style="color:#ef4444">negative profit</strong> (${fmt.$(fbCh.profit||0)}/month at 0.82x ROI). Both paid channels show strong diminishing returns — more volume means worse economics. The optimal mix cuts Facebook by 30%, scales Google by 55%, and grows organic channels to achieve <strong style="color:var(--green2)">+${K.optimal_vs_current_rev_lift}% revenue</strong> and <strong style="color:var(--green2)">+${K.optimal_vs_current_profit_lift}% profit</strong> vs. current.</div>
       </div>
       <div style="display:flex;gap:16px;flex-wrap:wrap">
         <div style="text-align:center;padding:14px 20px;background:rgba(239,68,68,0.08);border-radius:12px;border:1px solid rgba(239,68,68,0.15)">
-          <div style="font-size:24px;font-weight:800;color:#ef4444">-$21.7K</div>
+          <div style="font-size:24px;font-weight:800;color:#ef4444">${fmt.$(fbCh.profit||0)}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:2px">FB monthly loss</div>
         </div>
         <div style="text-align:center;padding:14px 20px;background:rgba(16,185,129,0.08);border-radius:12px;border:1px solid rgba(16,185,129,0.15)">
-          <div style="font-size:24px;font-weight:800;color:var(--green2)">+$71K</div>
+          <div style="font-size:24px;font-weight:800;color:var(--green2)">+${fmt.$(profitUplift)}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:2px">Monthly profit uplift</div>
         </div>
         <div style="text-align:center;padding:14px 20px;background:rgba(99,102,241,0.08);border-radius:12px;border:1px solid rgba(99,102,241,0.15)">
-          <div style="font-size:24px;font-weight:800;color:var(--accent2)">+$51K</div>
+          <div style="font-size:24px;font-weight:800;color:var(--accent2)">+${fmt.$(revUplift)}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:2px">Monthly rev uplift</div>
         </div>
       </div>
@@ -2020,7 +2026,7 @@ function buildMixSchoolTables() {
 
 function buildMixActions() {
   const actions = [
-    { priority: 'high', icon: '\ud83d\udea8', title: 'Cut Facebook Lead Volume by 30%', desc: 'Reduce from ~3,100 to ~2,200 leads/month by pausing the worst-performing campaigns identified in the April Deep-Dive. This alone eliminates $21.7K/month in losses. At lower volume, remaining FB leads yield $52/lead instead of $44/lead.', impact: 'Saves $21.7K/month in losses + improves FB rev/lead by 18%' },
+    { priority: 'high', icon: '\ud83d\udea8', title: 'Cut Facebook Lead Volume by 30%', desc: 'Reduce from ~3,500 to ~2,400 leads/month by pausing the worst-performing campaigns identified in the April Deep-Dive. Facebook currently loses $32.7K/month (0.82x ROI). At lower volume, remaining FB leads yield $52/lead instead of $44/lead, bringing FB to breakeven.', impact: 'Eliminates $32.7K/month in FB losses + improves FB rev/lead by 18%' },
     { priority: 'high', icon: '\ud83d\ude80', title: 'Scale Google Ads by 60%', desc: 'Increase from ~870 to ~1,400 leads/month. Google shows strong efficiency at this volume tier ($60/lead). Focus budget on Hebrew campaigns where Google ROI is 1.40x. Hebrew Google leads produce $98.50/lead vs Facebook at $78.12/lead.', impact: '+$14.4K monthly revenue at 1.22x ROI' },
     { priority: 'high', icon: '\ud83d\udce7', title: 'Grow Email Marketing List 15%', desc: 'Increase from 2,600 to 3,000 leads/month through: (1) improved lead capture forms, (2) reactivation sequences for dormant subscribers, (3) cross-school email campaigns. Email is pure profit at $38/lead with zero media cost.', impact: '+$15.2K monthly revenue at infinite ROI' },
     { priority: 'med', icon: '\ud83e\udd1d', title: 'Build Affiliate & Community Programs', desc: 'Scale affiliates from 120 to 300/month and community from 160 to 250/month. These organic channels produce $70-78/lead with zero cost. Partner with language learning influencers and create referral incentives for existing students.', impact: '+$19.4K monthly revenue at infinite ROI' },
