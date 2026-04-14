@@ -268,6 +268,16 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--card2); border-radius: 3px; }
 
+  /* ── DATE FILTER BAR ── */
+  .date-filter-bar { background:var(--bg2); border-bottom:1px solid var(--border); padding:10px 40px; position:sticky; top:112px; z-index:98; }
+  .date-filter-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .date-preset { padding:5px 13px; font-size:11px; font-weight:600; color:var(--text2); cursor:pointer; border:1px solid var(--border); background:none; border-radius:8px; transition:0.2s; font-family:inherit; }
+  .date-preset:hover { border-color:var(--border2); color:var(--text); }
+  .date-preset.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .date-input { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:5px 10px; font-size:11px; color:var(--text); font-family:inherit; }
+  .date-input::-webkit-calendar-picker-indicator { filter:invert(0.7); cursor:pointer; }
+  .date-sep { color:var(--text2); font-size:11px; }
+
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .page.active .content > * { animation: fadeIn 0.35s ease both; }
   .page.active .content > *:nth-child(1){animation-delay:.02s}
@@ -309,13 +319,31 @@
   </div>
 </nav>
 
+<!-- ── DATE FILTER BAR ── -->
+<div class="date-filter-bar">
+  <div class="date-filter-inner">
+    <button class="date-preset active" onclick="setPreset('all',this)">All Time</button>
+    <button class="date-preset" onclick="setPreset('2026',this)">2026</button>
+    <button class="date-preset" onclick="setPreset('2025',this)">2025</button>
+    <button class="date-preset" onclick="setPreset('2024',this)">2024</button>
+    <button class="date-preset" onclick="setPreset('12m',this)">Last 12M</button>
+    <button class="date-preset" onclick="setPreset('6m',this)">6M</button>
+    <button class="date-preset" onclick="setPreset('3m',this)">3M</button>
+    <button class="date-preset" onclick="setPreset('30d',this)">30D</button>
+    <span class="date-sep">|</span>
+    <input type="date" id="dfStart" class="date-input" onchange="onDateChange()">
+    <span class="date-sep">to</span>
+    <input type="date" id="dfEnd" class="date-input" onchange="onDateChange()">
+  </div>
+</div>
+
 <!-- ══════════ OVERVIEW ══════════ -->
 <div class="page active" id="page-overview">
 <div class="content">
   <div class="section-header">
     <div class="school-badge all"><div class="school-dot" style="background:#a855f7"></div>All Schools Combined</div>
     <div class="section-title">Campaign Performance Overview</div>
-    <div class="section-sub">Jan 2024 – Apr 2026 · English Language · Quality Leads · New Orders</div>
+    <div class="section-sub" id="overviewSub">Jan 2024 – Apr 2026 · English Language · Quality Leads · New Orders</div>
   </div>
 
   <div class="kpi-grid" id="overviewKPIs"></div>
@@ -613,11 +641,14 @@
 // ══════════════════════════════════════════
 //  DATA & GLOBALS
 // ══════════════════════════════════════════
+let RAW = null;
 let DATA = null;
 let APRIL = null;
 let charts = {};
 let tableModes = { heb: 'revenue', bib: 'revenue', all: 'revenue' };
 let campSchool = 'all';
+let dateStart = null;   // null = no filter
+let dateEnd = null;
 
 const fmt = {
   $:   v => '$' + (v >= 1e6 ? (v/1e6).toFixed(2)+'M' : v >= 1e3 ? (v/1e3).toFixed(1)+'K' : Number(v).toFixed(0)),
@@ -633,6 +664,177 @@ const gc = 'rgba(255,255,255,0.05)';
 const TT = { backgroundColor:'#22222d', borderColor:'rgba(255,255,255,0.12)', borderWidth:1, titleColor:'#f0f0f5', bodyColor:'#9999b0', padding:12, cornerRadius:10 };
 
 function dc(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+// ══════════════════════════════════════════
+//  AGGREGATE — builds DATA from RAW + date range
+// ══════════════════════════════════════════
+function aggregate() {
+  const d1 = dateStart || RAW.meta.minDate;
+  const d2 = dateEnd   || RAW.meta.maxDate;
+
+  // Filter daily rows
+  const daily = RAW.daily.filter(r => r.d >= d1 && r.d <= d2);
+
+  // ── summary_v2 ──
+  const sumSchool = (cat) => {
+    const rows = cat ? daily.filter(r => r.cat === cat) : daily;
+    const revenue = rows.reduce((a,r) => a + r.r, 0);
+    const cost    = rows.reduce((a,r) => a + r.c, 0);
+    const leads   = rows.reduce((a,r) => a + r.l, 0);
+    const orders  = rows.reduce((a,r) => a + r.o, 0);
+    const acquisitions = rows.reduce((a,r) => a + r.a, 0);
+    return { revenue, cost, roi: cost > 0 ? revenue / cost : 0, leads, orders, acquisitions };
+  };
+  const overall  = sumSchool(null);
+  const hebrew   = sumSchool('Hebrew Related');
+  const biblical = sumSchool('Biblical Related');
+
+  // ── trend (monthly) ──
+  const monthMap = {};
+  daily.forEach(r => {
+    const ym = r.d.slice(0,7);
+    if (!monthMap[ym]) monthMap[ym] = { hR:0,hC:0,hL:0,bR:0,bC:0,bL:0 };
+    const m = monthMap[ym];
+    if (r.cat === 'Hebrew Related')  { m.hR+=r.r; m.hC+=r.c; m.hL+=r.l; }
+    else                             { m.bR+=r.r; m.bC+=r.c; m.bL+=r.l; }
+  });
+  const months = Object.keys(monthMap).sort();
+  const trend = {
+    months,
+    hebrew_revenue:  months.map(m => monthMap[m].hR),
+    hebrew_roi:      months.map(m => monthMap[m].hC > 0 ? monthMap[m].hR / monthMap[m].hC : 0),
+    hebrew_leads:    months.map(m => monthMap[m].hL),
+    biblical_revenue:months.map(m => monthMap[m].bR),
+    biblical_roi:    months.map(m => monthMap[m].bC > 0 ? monthMap[m].bR / monthMap[m].bC : 0),
+    biblical_leads:  months.map(m => monthMap[m].bL),
+  };
+
+  // ── media (by school) ──
+  const mediaAgg = (cat) => {
+    const rows = daily.filter(r => r.cat === cat);
+    const map = {};
+    rows.forEach(r => {
+      if (!map[r.med]) map[r.med] = { Media: r.med, Revenue: 0, Cost: 0 };
+      map[r.med].Revenue += r.r;
+      map[r.med].Cost += r.c;
+    });
+    return Object.values(map);
+  };
+  const media = { hebrew: mediaAgg('Hebrew Related'), biblical: mediaAgg('Biblical Related') };
+
+  // ── countries (by school) ──
+  // Filter campaigns data by date range (ym format)
+  const yms = new Set(months);
+  const filteredCountries = RAW.countries.filter(r => yms.has(r.ym));
+
+  const countryAgg = (cat) => {
+    const rows = filteredCountries.filter(r => r.cat === cat);
+    const map = {};
+    rows.forEach(r => {
+      if (!map[r.cty]) map[r.cty] = { CountryName: r.cty, Revenue: 0, Cost: 0, Orders: 0, Acquisitions: 0 };
+      const c = map[r.cty];
+      c.Revenue += r.r; c.Cost += r.c; c.Orders += r.o; c.Acquisitions += r.a;
+    });
+    return Object.values(map)
+      .map(c => ({ ...c, ROI: c.Cost > 0 ? c.Revenue / c.Cost : 0 }))
+      .sort((a,b) => b.Revenue - a.Revenue);
+  };
+  const countries = { hebrew: countryAgg('Hebrew Related'), biblical: countryAgg('Biblical Related') };
+
+  // ── scatter + topCampaigns (by campaign, filtered months) ──
+  const filteredCamps = RAW.campaigns.filter(r => yms.has(r.ym));
+  const campMap = {};
+  filteredCamps.forEach(r => {
+    if (!campMap[r.cid]) campMap[r.cid] = { CampaignID: r.cid, CampaignCategory: r.cat, Media: r.med, Revenue:0, Cost:0, Orders:0, Acquisitions:0, Leads:0, Impressions:0 };
+    const c = campMap[r.cid];
+    c.Revenue += r.r; c.Cost += r.c; c.Orders += r.o; c.Acquisitions += r.a; c.Leads += r.l; c.Impressions += r.i;
+  });
+  const allCamps = Object.values(campMap).map(c => ({ ...c, ROI: c.Cost > 0 ? c.Revenue / c.Cost : 0 }));
+
+  const scatter = allCamps.filter(c => c.Cost > 0 && c.Revenue > 0);
+
+  const topFor = (cat) => {
+    const pool = cat === 'all' ? allCamps : allCamps.filter(c => c.CampaignCategory === cat);
+    return {
+      byRevenue: pool.filter(c=>c.Revenue>0).sort((a,b)=>b.Revenue-a.Revenue).slice(0,15),
+      byROI:     pool.filter(c=>c.Cost>100 && c.ROI>0).sort((a,b)=>b.ROI-a.ROI).slice(0,15),
+    };
+  };
+  const topCampaigns_v2 = {
+    all:      topFor('all'),
+    hebrew:   topFor('Hebrew Related'),
+    biblical: topFor('Biblical Related'),
+  };
+
+  DATA = {
+    summary_v2: {
+      dateRange: d1 + ' to ' + d2,
+      overall, hebrew, biblical,
+    },
+    trend,
+    media,
+    countries,
+    scatter,
+    topCampaigns_v2,
+  };
+}
+
+// ══════════════════════════════════════════
+//  DATE FILTER
+// ══════════════════════════════════════════
+function setPreset(key, btn) {
+  document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const max = RAW.meta.maxDate;
+  const maxD = new Date(max + 'T00:00:00');
+
+  if (key === 'all') {
+    dateStart = null; dateEnd = null;
+  } else if (/^\d{4}$/.test(key)) {
+    dateStart = key + '-01-01';
+    dateEnd   = key + '-12-31' <= max ? key + '-12-31' : max;
+  } else if (key === '12m') {
+    const d = new Date(maxD); d.setFullYear(d.getFullYear()-1); d.setDate(d.getDate()+1);
+    dateStart = d.toISOString().slice(0,10); dateEnd = max;
+  } else if (key === '6m') {
+    const d = new Date(maxD); d.setMonth(d.getMonth()-6); d.setDate(d.getDate()+1);
+    dateStart = d.toISOString().slice(0,10); dateEnd = max;
+  } else if (key === '3m') {
+    const d = new Date(maxD); d.setMonth(d.getMonth()-3); d.setDate(d.getDate()+1);
+    dateStart = d.toISOString().slice(0,10); dateEnd = max;
+  } else if (key === '30d') {
+    const d = new Date(maxD); d.setDate(d.getDate()-29);
+    dateStart = d.toISOString().slice(0,10); dateEnd = max;
+  }
+
+  document.getElementById('dfStart').value = dateStart || RAW.meta.minDate;
+  document.getElementById('dfEnd').value   = dateEnd   || RAW.meta.maxDate;
+
+  rebuildAll();
+}
+
+function onDateChange() {
+  const s = document.getElementById('dfStart').value;
+  const e = document.getElementById('dfEnd').value;
+  if (!s || !e || s > e) return;
+  dateStart = s; dateEnd = e;
+  // Clear active preset
+  document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+  rebuildAll();
+}
+
+function rebuildAll() {
+  aggregate();
+  document.getElementById('dateRange').textContent = DATA.summary_v2.dateRange;
+  buildOverview();
+  buildHebrew();
+  buildBiblical();
+  buildTable('allTable', DATA.topCampaigns_v2[campSchool][tableModes.all === 'revenue' ? 'byRevenue' : 'byROI']);
+  buildAnalysis();
+  // April tab uses APRIL data, not affected by date filter
+  setTimeout(() => Object.values(charts).forEach(c => c && c.resize && c.resize()), 100);
+}
 
 // ══════════════════════════════════════════
 //  NAVIGATION
@@ -669,6 +871,7 @@ function rankBadge(i) {
 
 // ── Shared campaign table builder (with acquisitions column) ──
 function buildTable(id, camps) {
+  if (!camps || !camps.length) { document.getElementById(id).innerHTML = '<tbody><tr><td colspan="9" style="padding:20px;text-align:center;color:var(--text2)">No campaigns in this filter range</td></tr></tbody>'; return; }
   const rows = camps.map((c,i) => `<tr>
     <td>${rankBadge(i)}</td>
     <td><span class="td-campaign">#${c.CampaignID}</span></td>
@@ -713,10 +916,18 @@ function setCampSchool(school, btn) {
 //  BOOT
 // ══════════════════════════════════════════
 async function boot() {
-  const [res1, res2] = await Promise.all([fetch('./data.json'), fetch('./april_data.json')]);
-  DATA  = await res1.json();
+  const [res1, res2] = await Promise.all([fetch('./raw.json'), fetch('./april_data.json')]);
+  RAW   = await res1.json();
   APRIL = await res2.json();
+
+  // Set date inputs to full range
+  document.getElementById('dfStart').value = RAW.meta.minDate;
+  document.getElementById('dfEnd').value   = RAW.meta.maxDate;
+
+  // Initial aggregate with no date filter
+  aggregate();
   document.getElementById('dateRange').textContent = DATA.summary_v2.dateRange;
+
   buildOverview();
   buildHebrew();
   buildBiblical();
@@ -731,13 +942,14 @@ async function boot() {
 function buildOverview() {
   const s = DATA.summary_v2;
   const o = s.overall, h = s.hebrew, b = s.biblical;
-  const convRate = (o.orders / o.leads * 100).toFixed(1);
-  const acqRate  = (o.acquisitions / o.leads * 100).toFixed(1);
+  const convRate = o.leads > 0 ? (o.orders / o.leads * 100).toFixed(1) : '0.0';
+  const acqRate  = o.leads > 0 ? (o.acquisitions / o.leads * 100).toFixed(1) : '0.0';
+  document.getElementById('overviewSub').textContent = s.dateRange + ' · English Language · Quality Leads · New Orders';
 
   document.getElementById('overviewKPIs').innerHTML = `
     <div class="kpi-card accent"><div class="kpi-label">Total Revenue</div><div class="kpi-value">${fmt.$(o.revenue)}</div><div class="kpi-sub">Combined both schools</div></div>
     <div class="kpi-card green"><div class="kpi-label">Total Ad Spend</div><div class="kpi-value">${fmt.$(o.cost)}</div><div class="kpi-sub">Paid media only</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">Overall ROI</div><div class="kpi-value">${o.roi.toFixed(2)}x</div><div class="kpi-sub"><span class="kpi-delta up">▲ Revenue / Cost</span></div></div>
+    <div class="kpi-card amber"><div class="kpi-label">Overall ROI</div><div class="kpi-value">${fmt.roi(o.roi)}</div><div class="kpi-sub"><span class="kpi-delta up">▲ Revenue / Cost</span></div></div>
     <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(o.acquisitions)}</div><div class="kpi-sub">New students acquired</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Total Leads</div><div class="kpi-value">${fmt.num(o.leads)}</div><div class="kpi-sub">Quality leads only</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Total Orders</div><div class="kpi-value">${fmt.num(o.orders)}</div><div class="kpi-sub">New order type</div></div>
@@ -745,15 +957,16 @@ function buildOverview() {
     <div class="kpi-card teal"><div class="kpi-label">Lead → Acquisition</div><div class="kpi-value">${acqRate}%</div><div class="kpi-sub">Lead to student conv.</div></div>
   `;
 
-  const hRevPct = (h.revenue / (h.revenue + b.revenue) * 100).toFixed(1);
-  const bRevPct = (100 - parseFloat(hRevPct)).toFixed(1);
+  const totalRev = h.revenue + b.revenue;
+  const hRevPct = totalRev > 0 ? (h.revenue / totalRev * 100).toFixed(1) : '0.0';
+  const bRevPct = totalRev > 0 ? (100 - parseFloat(hRevPct)).toFixed(1) : '0.0';
   document.getElementById('schoolCompare').innerHTML = `
     <div class="school-card heb">
       <div class="school-card-title">Hebrew School</div>
       <div class="school-card-sub">${hRevPct}% of total revenue · ${fmt.num(h.leads)} leads</div>
       <div class="school-metric-grid">
         <div class="school-metric"><div class="school-metric-val">${fmt.$(h.revenue)}</div><div class="school-metric-lbl">Revenue</div></div>
-        <div class="school-metric"><div class="school-metric-val">${h.roi.toFixed(2)}x</div><div class="school-metric-lbl">ROI</div></div>
+        <div class="school-metric"><div class="school-metric-val">${fmt.roi(h.roi)}</div><div class="school-metric-lbl">ROI</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.num(h.acquisitions)}</div><div class="school-metric-lbl">Acquisitions</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.$(h.cost)}</div><div class="school-metric-lbl">Ad Spend</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.num(h.orders)}</div><div class="school-metric-lbl">Orders</div></div>
@@ -765,7 +978,7 @@ function buildOverview() {
       <div class="school-card-sub">${bRevPct}% of total revenue · ${fmt.num(b.leads)} leads</div>
       <div class="school-metric-grid">
         <div class="school-metric"><div class="school-metric-val">${fmt.$(b.revenue)}</div><div class="school-metric-lbl">Revenue</div></div>
-        <div class="school-metric"><div class="school-metric-val">${b.roi.toFixed(2)}x</div><div class="school-metric-lbl">ROI</div></div>
+        <div class="school-metric"><div class="school-metric-val">${fmt.roi(b.roi)}</div><div class="school-metric-lbl">ROI</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.num(b.acquisitions)}</div><div class="school-metric-lbl">Acquisitions</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.$(b.cost)}</div><div class="school-metric-lbl">Ad Spend</div></div>
         <div class="school-metric"><div class="school-metric-val">${fmt.num(b.orders)}</div><div class="school-metric-lbl">Orders</div></div>
@@ -791,6 +1004,7 @@ function setTrendMode(m, btn) {
 function buildTrendChart() {
   dc('trend');
   const t = DATA.trend;
+  if (!t.months.length) return;
   const map = {
     revenue:     { h: t.hebrew_revenue,  b: t.biblical_revenue,  fmt: v => '$'+(v/1000).toFixed(0)+'K' },
     roi:         { h: t.hebrew_roi,      b: t.biblical_roi,      fmt: v => v.toFixed(2)+'x' },
@@ -815,6 +1029,7 @@ function buildMediaChart() {
   const paid=['Facebook','Google','Affiliates','PPC Other','Web Campaign'];
   const labs=[], revs=[], costs=[];
   paid.forEach(ch=>{ if(all[ch]&&all[ch].Revenue>0){labs.push(ch);revs.push(all[ch].Revenue);costs.push(all[ch].Cost);} });
+  if (!labs.length) return;
   const cols=['#6366f1','#10b981','#f59e0b','#ef4444','#06b6d4'];
   const ctx = document.getElementById('mediaChart').getContext('2d');
   charts['media'] = new Chart(ctx, { type:'bar', data:{ labels:labs, datasets:[
@@ -832,6 +1047,7 @@ function buildCountryChartOverview() {
   const all = {};
   [...DATA.countries.hebrew, ...DATA.countries.biblical].forEach(c => { if(!all[c.CountryName]) all[c.CountryName]=0; all[c.CountryName]+=c.Revenue; });
   const sorted = Object.entries(all).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if (!sorted.length) return;
   const pal = ['#6366f1','#818cf8','#10b981','#34d399','#f59e0b','#fbbf24','#ef4444','#06b6d4','#a855f7','#ec4899'];
   const ctx = document.getElementById('countryChartOverview').getContext('2d');
   charts['ctryOv'] = new Chart(ctx, { type:'doughnut', data:{ labels:sorted.map(x=>x[0]), datasets:[{ data:sorted.map(x=>x[1]), backgroundColor:pal, borderWidth:2, borderColor:'#1c1c25', hoverOffset:8 }]},
@@ -862,13 +1078,14 @@ function buildScatterChart() {
 // ══════════════════════════════════════════
 function buildHebrew() {
   const h = DATA.summary_v2.hebrew;
-  const convRate = (h.orders / h.leads * 100).toFixed(1);
-  const acqRate  = (h.acquisitions / h.leads * 100).toFixed(1);
-  const revShare = (h.revenue / DATA.summary_v2.overall.revenue * 100).toFixed(1);
+  const convRate = h.leads > 0 ? (h.orders / h.leads * 100).toFixed(1) : '0.0';
+  const acqRate  = h.leads > 0 ? (h.acquisitions / h.leads * 100).toFixed(1) : '0.0';
+  const totalRev = DATA.summary_v2.overall.revenue;
+  const revShare = totalRev > 0 ? (h.revenue / totalRev * 100).toFixed(1) : '0.0';
   document.getElementById('hebrewKPIs').innerHTML = `
     <div class="kpi-card accent"><div class="kpi-label">Revenue</div><div class="kpi-value">${fmt.$(h.revenue)}</div><div class="kpi-sub">${revShare}% of total portfolio</div></div>
     <div class="kpi-card green"><div class="kpi-label">Ad Spend</div><div class="kpi-value">${fmt.$(h.cost)}</div><div class="kpi-sub">Paid media only</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${h.roi.toFixed(2)}x</div><div class="kpi-sub"><span class="kpi-delta up">Higher than Biblical</span></div></div>
+    <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${fmt.roi(h.roi)}</div><div class="kpi-sub"><span class="kpi-delta up">Higher than Biblical</span></div></div>
     <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(h.acquisitions)}</div><div class="kpi-sub">New students</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Leads</div><div class="kpi-value">${fmt.num(h.leads)}</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Orders</div><div class="kpi-value">${fmt.num(h.orders)}</div></div>
@@ -887,6 +1104,7 @@ function setBibMode(m,btn){ bibMode=m; btn.closest('.chart-toggle').querySelecto
 function buildSchoolTrend(school) {
   const key = school+'Trend'; dc(key);
   const t = DATA.trend;
+  if (!t.months.length) return;
   const isHeb = school==='heb';
   const mode  = isHeb ? hebMode : bibMode;
   const color = isHeb ? '#6366f1' : '#10b981';
@@ -906,6 +1124,7 @@ function buildSchoolTrend(school) {
 function buildSchoolMedia(school) {
   const key = school+'Media'; dc(key);
   const md  = DATA.media[school==='heb'?'hebrew':'biblical'].filter(m=>m.Revenue>0).sort((a,b)=>b.Revenue-a.Revenue).slice(0,6);
+  if (!md.length) return;
   const cols = school==='heb'
     ? ['#6366f1','#818cf8','#a5b4fc','#06b6d4','#f59e0b','#ec4899']
     : ['#10b981','#34d399','#6ee7b7','#06b6d4','#f59e0b','#a855f7'];
@@ -921,6 +1140,7 @@ function buildSchoolMedia(school) {
 function buildCountryBar(school) {
   const key = school+'Ctry'; dc(key);
   const ct  = DATA.countries[school==='heb'?'hebrew':'biblical'].slice(0,10);
+  if (!ct.length) return;
   const col = school==='heb' ? '#6366f1' : '#10b981';
   const ctx = document.getElementById(school+'CountryChart').getContext('2d');
   charts[key] = new Chart(ctx, { type:'bar', data:{ labels:ct.map(c=>c.CountryName), datasets:[{ data:ct.map(c=>c.Revenue), backgroundColor:col+'bb', borderColor:col, borderWidth:1, borderRadius:7, borderSkipped:false }]},
@@ -936,13 +1156,14 @@ function buildCountryBar(school) {
 // ══════════════════════════════════════════
 function buildBiblical() {
   const b = DATA.summary_v2.biblical;
-  const convRate = (b.orders / b.leads * 100).toFixed(1);
-  const acqRate  = (b.acquisitions / b.leads * 100).toFixed(1);
-  const revShare = (b.revenue / DATA.summary_v2.overall.revenue * 100).toFixed(1);
+  const convRate = b.leads > 0 ? (b.orders / b.leads * 100).toFixed(1) : '0.0';
+  const acqRate  = b.leads > 0 ? (b.acquisitions / b.leads * 100).toFixed(1) : '0.0';
+  const totalRev = DATA.summary_v2.overall.revenue;
+  const revShare = totalRev > 0 ? (b.revenue / totalRev * 100).toFixed(1) : '0.0';
   document.getElementById('biblicalKPIs').innerHTML = `
     <div class="kpi-card green"><div class="kpi-label">Revenue</div><div class="kpi-value">${fmt.$(b.revenue)}</div><div class="kpi-sub">${revShare}% of total portfolio</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Ad Spend</div><div class="kpi-value">${fmt.$(b.cost)}</div></div>
-    <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${b.roi.toFixed(2)}x</div><div class="kpi-sub"><span class="kpi-delta neu">Largest revenue school</span></div></div>
+    <div class="kpi-card amber"><div class="kpi-label">ROI</div><div class="kpi-value">${fmt.roi(b.roi)}</div><div class="kpi-sub"><span class="kpi-delta neu">Largest revenue school</span></div></div>
     <div class="kpi-card teal"><div class="kpi-label">Acquisitions</div><div class="kpi-value">${fmt.num(b.acquisitions)}</div><div class="kpi-sub">New students</div></div>
     <div class="kpi-card accent"><div class="kpi-label">Leads</div><div class="kpi-value">${fmt.num(b.leads)}</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Orders</div><div class="kpi-value">${fmt.num(b.orders)}</div></div>
@@ -960,47 +1181,47 @@ function buildAnalysis() {
   const s = DATA.summary_v2;
   const h = s.hebrew, b = s.biblical;
 
-  const hConv = (h.orders / h.leads * 100).toFixed(2);
-  const bConv = (b.orders / b.leads * 100).toFixed(2);
-  const hCPO  = (h.cost / h.orders).toFixed(0);
-  const bCPO  = (b.cost / b.orders).toFixed(0);
-  const hAOV  = (h.revenue / h.orders).toFixed(0);
-  const bAOV  = (b.revenue / b.orders).toFixed(0);
-  const hCAC  = (h.cost / h.acquisitions).toFixed(0);
-  const bCAC  = (b.cost / b.acquisitions).toFixed(0);
+  const hConv = h.leads > 0 ? (h.orders / h.leads * 100).toFixed(2) : '0.00';
+  const bConv = b.leads > 0 ? (b.orders / b.leads * 100).toFixed(2) : '0.00';
+  const hCPO  = h.orders > 0 ? (h.cost / h.orders).toFixed(0) : 'N/A';
+  const bCPO  = b.orders > 0 ? (b.cost / b.orders).toFixed(0) : 'N/A';
+  const hAOV  = h.orders > 0 ? (h.revenue / h.orders).toFixed(0) : 'N/A';
+  const bAOV  = b.orders > 0 ? (b.revenue / b.orders).toFixed(0) : 'N/A';
+  const hCAC  = h.acquisitions > 0 ? (h.cost / h.acquisitions).toFixed(0) : 'N/A';
+  const bCAC  = b.acquisitions > 0 ? (b.cost / b.acquisitions).toFixed(0) : 'N/A';
 
-  const topBibRev = DATA.topCampaigns_v2.biblical.byRevenue[0];
-  const topHebRev = DATA.topCampaigns_v2.hebrew.byRevenue[0];
-  const topHebROI = DATA.topCampaigns_v2.hebrew.byROI[0];
-  const topBibROI = DATA.topCampaigns_v2.biblical.byROI[0];
+  const topBibRev = DATA.topCampaigns_v2.biblical.byRevenue[0] || { CampaignID:'N/A',ROI:0,Acquisitions:0,Orders:0 };
+  const topHebRev = DATA.topCampaigns_v2.hebrew.byRevenue[0] || { CampaignID:'N/A',ROI:0,Acquisitions:0,Orders:0 };
+  const topHebROI = DATA.topCampaigns_v2.hebrew.byROI[0] || { CampaignID:'N/A',ROI:0,Acquisitions:0,Orders:0 };
+  const topBibROI = DATA.topCampaigns_v2.biblical.byROI[0] || { CampaignID:'N/A',ROI:0,Acquisitions:0,Orders:0 };
 
   document.getElementById('analysisContent').innerHTML = `
 
     <div class="stat-row">
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${fmt.$(s.overall.revenue)}</div><div class="stat-chip-lbl">Total Revenue</div></div>
-      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${s.overall.roi.toFixed(2)}x</div><div class="stat-chip-lbl">Portfolio ROI</div></div>
+      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${fmt.roi(s.overall.roi)}</div><div class="stat-chip-lbl">Portfolio ROI</div></div>
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${fmt.num(s.overall.acquisitions)}</div><div class="stat-chip-lbl">Total Acquisitions</div></div>
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">${fmt.num(s.overall.leads)}</div><div class="stat-chip-lbl">Total Leads</div></div>
       <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">${fmt.num(s.overall.orders)}</div><div class="stat-chip-lbl">Total Orders</div></div>
-      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--purple)">${(s.overall.orders/s.overall.leads*100).toFixed(2)}%</div><div class="stat-chip-lbl">Lead → Order</div></div>
-      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${(s.overall.acquisitions/s.overall.leads*100).toFixed(2)}%</div><div class="stat-chip-lbl">Lead → Acquisition</div></div>
+      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--purple)">${s.overall.leads>0 ? (s.overall.orders/s.overall.leads*100).toFixed(2) : '0.00'}%</div><div class="stat-chip-lbl">Lead → Order</div></div>
+      <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${s.overall.leads>0 ? (s.overall.acquisitions/s.overall.leads*100).toFixed(2) : '0.00'}%</div><div class="stat-chip-lbl">Lead → Acquisition</div></div>
     </div>
 
     <div class="analysis-grid">
       <div class="analysis-card">
         <div class="analysis-h"><div class="analysis-icon icon-insight">📊</div>Hebrew School — Key Metrics</div>
         <div class="stat-row">
-          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${h.roi.toFixed(2)}x</div><div class="stat-chip-lbl">ROI</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${fmt.roi(h.roi)}</div><div class="stat-chip-lbl">ROI</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${fmt.num(h.acquisitions)}</div><div class="stat-chip-lbl">Acquisitions</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${hConv}%</div><div class="stat-chip-lbl">Conv. Rate</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">$${hCAC}</div><div class="stat-chip-lbl">CAC</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">$${hAOV}</div><div class="stat-chip-lbl">Avg Order Value</div></div>
         </div>
         <ul class="insight-list">
-          <li><div class="bullet accent"></div><div><strong>Superior ROI efficiency</strong> — Hebrew campaigns return <strong>${h.roi.toFixed(2)}x</strong> per dollar spent vs Biblical's ${b.roi.toFixed(2)}x. A meaningful ROI advantage makes Hebrew the more capital-efficient school.</div></li>
-          <li><div class="bullet green"></div><div><strong>Higher average order value</strong> — $${hAOV} per order vs Biblical's $${bAOV}, suggesting Hebrew learners convert at higher price points or upsell more frequently.</div></li>
+          <li><div class="bullet accent"></div><div><strong>Superior ROI efficiency</strong> — Hebrew campaigns return <strong>${fmt.roi(h.roi)}</strong> per dollar spent vs Biblical at ${fmt.roi(b.roi)}. A meaningful ROI advantage makes Hebrew the more capital-efficient school.</div></li>
+          <li><div class="bullet green"></div><div><strong>Higher average order value</strong> — $${hAOV} per order vs Biblical $${bAOV}, suggesting Hebrew learners convert at higher price points or upsell more frequently.</div></li>
           <li><div class="bullet cyan"></div><div><strong>Cost per acquisition: $${hCAC}</strong> — ${parseInt(hCAC) < parseInt(bCAC) ? 'lower than Biblical ($'+bCAC+'), confirming Hebrew campaigns attract and convert at a more efficient rate.' : 'compared to Biblical ($'+bCAC+').'}</div></li>
-          <li><div class="bullet accent"></div><div><strong>Best Google performance</strong> — Campaign #${topHebROI.CampaignID} delivers <strong>${topHebROI.ROI.toFixed(2)}x ROI</strong> with ${fmt.num(topHebROI.Acquisitions||0)} acquisitions and ${fmt.num(topHebROI.Orders)} orders — a clear high-efficiency target for scaling.</div></li>
+          <li><div class="bullet accent"></div><div><strong>Top campaign: #${topHebROI.CampaignID}</strong> delivers <strong>${topHebROI.ROI.toFixed(2)}x ROI</strong> with ${fmt.num(topHebROI.Acquisitions||0)} acquisitions and ${fmt.num(topHebROI.Orders)} orders — a clear high-efficiency target for scaling.</div></li>
           <li><div class="bullet amber"></div><div><strong>Facebook ROI drag</strong> — Top Facebook campaigns generate high revenue but sub-1x ROI, indicating over-spend on acquisition. CPC renegotiation needed.</div></li>
         </ul>
       </div>
@@ -1008,50 +1229,36 @@ function buildAnalysis() {
       <div class="analysis-card">
         <div class="analysis-h"><div class="analysis-icon icon-insight" style="background:rgba(16,185,129,0.15)">📗</div>Biblical School — Key Metrics</div>
         <div class="stat-row">
-          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${b.roi.toFixed(2)}x</div><div class="stat-chip-lbl">ROI</div></div>
+          <div class="stat-chip"><div class="stat-chip-val" style="color:var(--green2)">${fmt.roi(b.roi)}</div><div class="stat-chip-lbl">ROI</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--cyan)">${fmt.num(b.acquisitions)}</div><div class="stat-chip-lbl">Acquisitions</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--accent2)">${bConv}%</div><div class="stat-chip-lbl">Conv. Rate</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--amber2)">$${bCAC}</div><div class="stat-chip-lbl">CAC</div></div>
           <div class="stat-chip"><div class="stat-chip-val" style="color:var(--blue2)">$${bAOV}</div><div class="stat-chip-lbl">Avg Order Value</div></div>
         </div>
         <ul class="insight-list">
-          <li><div class="bullet green"></div><div><strong>Largest revenue generator</strong> — Biblical produces <strong>${fmt.$(b.revenue)}</strong> (${(b.revenue/(b.revenue+h.revenue)*100).toFixed(1)}% of total), anchored by campaign #${topBibRev.CampaignID} which alone drove $1.1M.</div></li>
-          <li><div class="bullet accent"></div><div><strong>Massive lead &amp; acquisition volume</strong> — ${fmt.num(b.leads)} quality leads and ${fmt.num(b.acquisitions)} acquisitions vs Hebrew's ${fmt.num(h.acquisitions)}, suggesting broader top-of-funnel reach.</div></li>
+          <li><div class="bullet green"></div><div><strong>Largest revenue generator</strong> — Biblical produces <strong>${fmt.$(b.revenue)}</strong> (${(b.revenue+h.revenue)>0 ? (b.revenue/(b.revenue+h.revenue)*100).toFixed(1) : '0'}% of total), anchored by campaign #${topBibRev.CampaignID}.</div></li>
+          <li><div class="bullet accent"></div><div><strong>Massive lead & acquisition volume</strong> — ${fmt.num(b.leads)} quality leads and ${fmt.num(b.acquisitions)} acquisitions vs Hebrew ${fmt.num(h.acquisitions)}, suggesting broader top-of-funnel reach.</div></li>
           <li><div class="bullet cyan"></div><div><strong>Cost per acquisition: $${bCAC}</strong> — scaling Biblical acquisitions requires more spend per student, pointing to audience saturation in core channels.</div></li>
-          <li><div class="bullet amber"></div><div><strong>ROI compression risk</strong> — Several high-spend Facebook campaigns are revenue-heavy but ROI-negative — representing capital misallocation of ~$700K/yr if not rebalanced.</div></li>
-          <li><div class="bullet cyan"></div><div><strong>Google outperforms Facebook</strong> — Biblical Google campaigns deliver avg ~1.4x ROI vs Facebook's 0.86x. Budget reallocation could improve overall Biblical ROI by an estimated 15-20%.</div></li>
+          <li><div class="bullet amber"></div><div><strong>ROI compression risk</strong> — Several high-spend Facebook campaigns are revenue-heavy but ROI-negative — representing capital misallocation if not rebalanced.</div></li>
+          <li><div class="bullet cyan"></div><div><strong>Google outperforms Facebook</strong> — Budget reallocation from low-ROI Facebook to Google could improve overall Biblical ROI significantly.</div></li>
         </ul>
       </div>
     </div>
 
     <div class="analysis-grid">
       <div class="analysis-card full">
-        <div class="analysis-h"><div class="analysis-icon icon-insight">🏆</div>Optimal Campaigns — Dual-Criteria (Revenue × ROI)</div>
+        <div class="analysis-h"><div class="analysis-icon icon-insight">🏆</div>Top Campaigns — Dual-Criteria (Revenue × ROI)</div>
         <ul class="insight-list">
+          ${DATA.topCampaigns_v2.hebrew.byROI.slice(0,2).map(c => `
           <li><div class="bullet accent"></div><div>
-            <strong>Hebrew #50138 (Google) — Best Overall Efficiency</strong><br>
-            Revenue: $295K · ROI: <strong>2.37x</strong> · Acquisitions: ${fmt.num(DATA.topCampaigns_v2.hebrew.byROI.find(c=>c.CampaignID==50138)?.Acquisitions||0)} · Orders: 361<br>
-            Highest revenue-generating campaign with ROI above 2x. Gold standard for Hebrew Google investment.
-          </div></li>
-          <li><div class="bullet accent"></div><div>
-            <strong>Hebrew #104447 (Google) — Strong Scale + Efficiency</strong><br>
-            Revenue: $290K · ROI: <strong>1.71x</strong> · Orders: 377 · Leads: 2,258<br>
-            Second highest Hebrew revenue with solid ROI. Consistent lead quality indicates a mature, well-optimised campaign.
-          </div></li>
+            <strong>Hebrew #${c.CampaignID} (${c.Media}) — ${c.ROI.toFixed(2)}x ROI</strong><br>
+            Revenue: ${fmt.$(c.Revenue)} · Acquisitions: ${fmt.num(c.Acquisitions||0)} · Orders: ${fmt.num(c.Orders)}
+          </div></li>`).join('')}
+          ${DATA.topCampaigns_v2.biblical.byRevenue.slice(0,2).map(c => `
           <li><div class="bullet green"></div><div>
-            <strong>Biblical #103760 (Facebook) — Best Balance in Biblical</strong><br>
-            Revenue: $362K · ROI: <strong>1.32x</strong> · Acquisitions: ${fmt.num(DATA.topCampaigns_v2.biblical.byRevenue.find(c=>c.CampaignID==103760)?.Acquisitions||0)} · Orders: 495<br>
-            The only top-revenue Biblical Facebook campaign with ROI above 1.2x. Efficient at scale.
-          </div></li>
-          <li><div class="bullet green"></div><div>
-            <strong>Biblical #103508 (Facebook) — Revenue Giant, ROI Watch</strong><br>
-            Revenue: <strong>$1.11M</strong> · ROI: <strong>1.00x</strong> · Acquisitions: ${fmt.num(DATA.topCampaigns_v2.biblical.byRevenue.find(c=>c.CampaignID==103508)?.Acquisitions||0)} · Orders: 1,516<br>
-            Largest revenue campaign in the portfolio. Near break-even ROI — likely drives brand awareness and downstream organic conversions. Monitor but do not cut.
-          </div></li>
-          <li><div class="bullet green"></div><div>
-            <strong>Biblical #104571 (Google) — High ROI Specialist</strong><br>
-            Revenue: $112K · ROI: <strong>1.80x</strong> · Orders: 131 · Under-capitalised relative to its performance profile. Increase budget allocation here.
-          </div></li>
+            <strong>Biblical #${c.CampaignID} (${c.Media}) — ${fmt.$(c.Revenue)}</strong><br>
+            ROI: <strong>${c.ROI.toFixed(2)}x</strong> · Acquisitions: ${fmt.num(c.Acquisitions||0)} · Orders: ${fmt.num(c.Orders)}
+          </div></li>`).join('')}
         </ul>
       </div>
     </div>
@@ -1062,38 +1269,38 @@ function buildAnalysis() {
 
         <div class="rec-card">
           <div class="rec-priority high">Priority 1 — Scale Immediately</div>
-          <div class="rec-title">Double-Down on Hebrew Google (#50138, #104447, #104448, #105658)</div>
-          <div class="rec-desc">These 4 campaigns collectively generate $1.01M revenue at an average ROI of 1.71x — the strongest risk-adjusted return in the portfolio. Recommend a 30-50% budget increase on each, with close CPA monitoring during the scale phase.</div>
+          <div class="rec-title">Double-Down on Hebrew Google top campaigns</div>
+          <div class="rec-desc">Hebrew Google campaigns show the strongest risk-adjusted return in the portfolio. Recommend a 30-50% budget increase on top performers, with close CPA monitoring during the scale phase.</div>
         </div>
 
         <div class="rec-card">
           <div class="rec-priority high">Priority 2 — Rebalance Biblical Facebook Budget</div>
           <div class="rec-title">Reduce spend on ROI-negative Biblical Facebook campaigns</div>
-          <div class="rec-desc">Campaign #104176 (ROI: 0.50x) and #111168 (ROI: 0.88x) are consuming over $1.2M combined with sub-optimal returns. Reallocating 30% of this spend to Biblical Google campaigns could improve overall Biblical ROI from 1.62x to an estimated 1.85-2.0x — adding ~$200K in incremental annual profit.</div>
+          <div class="rec-desc">Reallocating 30% of low-ROI Facebook spend to Biblical Google campaigns could improve overall Biblical ROI significantly — adding incremental annual profit.</div>
         </div>
 
         <div class="rec-card">
           <div class="rec-priority high">Priority 3 — Activate Biblical Google Pipeline</div>
-          <div class="rec-title">Scale #104571 (ROI: 1.80x) and #105093 (ROI: 1.56x)</div>
-          <div class="rec-desc">These mid-size Biblical Google campaigns have demonstrated exceptional ROI with meaningful acquisition volumes. Target 2x spend increase with controlled A/B testing on landing pages.</div>
+          <div class="rec-title">Scale high-ROI Biblical Google campaigns</div>
+          <div class="rec-desc">Mid-size Biblical Google campaigns have demonstrated exceptional ROI with meaningful acquisition volumes. Target 2x spend increase with controlled A/B testing.</div>
         </div>
 
         <div class="rec-card">
           <div class="rec-priority med">Priority 4 — Geographic Expansion</div>
-          <div class="rec-title">Prioritise Germany, Switzerland, Singapore, and UAE</div>
-          <div class="rec-desc">These markets exhibit exceptional ROI outliers: Germany (6.9x), Switzerland (7.8x), Singapore (4.8x). A targeted $50K quarterly test budget per market could unlock $300–500K in incremental annual revenue at superior ROI multiples vs the saturated US market.</div>
+          <div class="rec-title">Prioritise high-ROI non-US markets</div>
+          <div class="rec-desc">Markets like Germany, Switzerland, and Singapore exhibit exceptional ROI outliers. A targeted $50K quarterly test budget per market could unlock significant incremental revenue at superior ROI multiples vs the saturated US market.</div>
         </div>
 
         <div class="rec-card">
           <div class="rec-priority med">Priority 5 — Email Revenue Protection</div>
-          <div class="rec-title">Email generates $2.75M at $0 media cost — protect and grow</div>
-          <div class="rec-desc">Email campaigns contribute $2.75M combined revenue — 22% of the total portfolio at infinite ROI. Invest in CRM tooling, list segmentation, and reactivation campaigns before marginal paid media spend.</div>
+          <div class="rec-title">Email generates high revenue at $0 media cost — protect and grow</div>
+          <div class="rec-desc">Email campaigns contribute significant revenue — a large share of the total portfolio at infinite ROI. Invest in CRM tooling, list segmentation, and reactivation campaigns before marginal paid media spend.</div>
         </div>
 
         <div class="rec-card">
           <div class="rec-priority low">Priority 6 — Reduce US Concentration Risk</div>
-          <div class="rec-title">US is 81% of revenue — strategic diversification needed</div>
-          <div class="rec-desc">$10.2M of the $12.5M portfolio originates from the United States. A 10% budget reallocation to high-ROI non-US markets over 12 months would reduce concentration risk while improving blended ROI.</div>
+          <div class="rec-title">US concentration is high — strategic diversification needed</div>
+          <div class="rec-desc">A majority of the portfolio originates from the United States. A 10% budget reallocation to high-ROI non-US markets over 12 months would reduce concentration risk while improving blended ROI.</div>
         </div>
       </div>
     </div>
@@ -1122,21 +1329,20 @@ function buildAnalysis() {
     <div class="analysis-card" style="margin-bottom:24px">
       <div class="analysis-h"><div class="analysis-icon icon-country">📈</div>High-ROI Underinvested Markets</div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">The following markets have extraordinary ROI multiples but under-1% of total spend — significant untapped potential.</div>
-      ${[
-        {name:'Austria (Biblical)',    roi:112.5, rev:'$16.7K', spend:'$149',   note:'Near-zero spend, massive return'},
-        {name:'Costa Rica (Biblical)', roi:13.9,  rev:'$10.9K', spend:'$784',   note:'Tiny spend, outsized conversion'},
-        {name:'South Korea (Biblical)',roi:47.0,  rev:'$10.7K', spend:'$228',   note:'Faith-based learner density'},
-        {name:'Germany (Combined)',    roi:6.9,   rev:'$169K',  spend:'$24.4K', note:'Largest underinvested English market'},
-        {name:'Switzerland (Combined)',roi:7.8,   rev:'$93.6K', spend:'$12K',   note:'High LTV per order — $985 avg'},
-        {name:'Mexico (Hebrew)',       roi:11.7,  rev:'$15.7K', spend:'$1.3K',  note:'Spanish-bilingual Hebrew learner segment'},
-      ].map(m=>`
+      ${(() => {
+        // Dynamically find high-ROI small markets from country data
+        const allCtry = [...DATA.countries.hebrew.map(c=>({...c,school:'Hebrew'})), ...DATA.countries.biblical.map(c=>({...c,school:'Biblical'}))];
+        const hiRoi = allCtry.filter(c => c.ROI > 3 && c.Revenue > 1000 && c.Cost > 50 && c.Cost < s.overall.cost * 0.02).sort((a,b) => b.ROI - a.ROI).slice(0,6);
+        if (!hiRoi.length) return '<div style="font-size:12px;color:var(--text2)">No outlier markets found in this date range.</div>';
+        return hiRoi.map(m => `
         <div class="progress-item">
           <div class="progress-header">
-            <span class="progress-label">${m.name} <span style="font-size:11px;color:var(--text2)">(${m.note})</span></span>
-            <span class="progress-val" style="color:var(--green2)">${m.roi.toFixed(1)}x ROI · ${m.rev} · ${m.spend} spend</span>
+            <span class="progress-label">${m.CountryName} (${m.school})</span>
+            <span class="progress-val" style="color:var(--green2)">${m.ROI.toFixed(1)}x ROI · ${fmt.$(m.Revenue)} · ${fmt.$(m.Cost)} spend</span>
           </div>
-          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.min(100,m.roi*1.2)}%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div></div>
-        </div>`).join('')}
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${Math.min(100,m.ROI*1.2)}%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div></div>
+        </div>`).join('');
+      })()}
     </div>
 
     <div class="analysis-card" style="margin-bottom:0;background:rgba(99,102,241,0.04);border-color:rgba(99,102,241,0.15)">
@@ -1146,7 +1352,7 @@ function buildAnalysis() {
         <strong style="color:var(--text)">ROI</strong> = Revenue ÷ Mcost (paid media only) ·
         <strong style="color:var(--text)">Acquisitions</strong> = new students acquired (StudentCounter) ·
         <strong style="color:var(--text)">CAC</strong> = Cost ÷ Acquisitions ·
-        <strong style="color:var(--text)">Dataset</strong>: 749,841 daily records · Jan 2024 – Apr 2026 · English language · Quality leads · New order type ·
+        <strong style="color:var(--text)">Dataset</strong>: Daily records · ${DATA.summary_v2.dateRange} · English language · Quality leads · New order type ·
         <strong style="color:var(--text)">Categories</strong>: Hebrew Related + Biblical Related
       </div>
     </div>
@@ -1371,10 +1577,10 @@ function buildAprInsights() {
   const fbRevShare  = fb.revenue / ((fb.revenue||0) + (gg.revenue||0)) * 100;
 
   const insights = [
-    { icon:'🚨', text:`<strong>April 2026 ROI is 0.66x — losing $0.34 on every dollar spent.</strong> Revenue is $69K against $105K in ad spend (Apr 1–12). This is a 28% deterioration vs. 2024 (0.92x) for the same window. The bleed is real and accelerating.` },
+    { icon:'🚨', text:`<strong>April 2026 ROI is 0.66x — losing $0.34 on every dollar spent.</strong> Revenue is $69K against $105K in ad spend (Apr 1–13). This is a 28% deterioration vs. 2024 (0.92x) for the same window. The bleed is real and accelerating.` },
     { icon:'📱', text:`<strong>Facebook is the primary drag: ROI 0.51x</strong> — spending $83.7K to generate only $43K in revenue. Facebook absorbs ${fbCostShare.toFixed(0)}% of budget but delivers only ${fbRevShare.toFixed(0)}% of revenue. Every $1 on Facebook returns $0.51.` },
-    { icon:'✅', text:`<strong>Google is profitable at 1.24x ROI</strong> — $21K spend producing $26K revenue. Google has a much higher lead-to-order rate (${((gg.leadToOrder||0)*100).toFixed(1)}% vs Facebook\'s ${((fb.leadToOrder||0)*100).toFixed(1)}%) despite higher CPL ($${(gg.cpl||0).toFixed(0)} vs $${(fb.cpl||0).toFixed(0)}). Google leads convert better.` },
-    { icon:'💰', text:`<strong>Facebook CPL looks cheap ($${(fb.cpl||0).toFixed(0)}) but produces low-quality leads.</strong> Facebook generates ${(fb.leads||0).toLocaleString()} leads vs Google\'s ${(gg.leads||0).toLocaleString()}, but the conversion to orders is dramatically worse. Volume without quality is pure cost.` },
+    { icon:'✅', text:`<strong>Google is profitable at 1.24x ROI</strong> — $21K spend producing $26K revenue. Google has a much higher lead-to-order rate (${((gg.leadToOrder||0)*100).toFixed(1)}% vs Facebook's ${((fb.leadToOrder||0)*100).toFixed(1)}%) despite higher CPL ($${(gg.cpl||0).toFixed(0)} vs $${(fb.cpl||0).toFixed(0)}). Google leads convert better.` },
+    { icon:'💰', text:`<strong>Facebook CPL looks cheap ($${(fb.cpl||0).toFixed(0)}) but produces low-quality leads.</strong> Facebook generates ${(fb.leads||0).toLocaleString()} leads vs Google's ${(gg.leads||0).toLocaleString()}, but the conversion to orders is dramatically worse. Volume without quality is pure cost.` },
     { icon:'📉', text:`<strong>Year-over-year decline is structural, not seasonal.</strong> Apr 2024: $94K revenue / 0.92x ROI → Apr 2025: $58K / 0.55x → Apr 2026: $69K / 0.66x. Revenue improved slightly from the 2025 trough but ROI remains far below breakeven. The cost base has grown faster than revenue.` },
     { icon:'🛠', text:`<strong>Recommended actions:</strong> (1) Cut Facebook daily budget by 30–40% immediately — redirect to Google. (2) Pause all zero-revenue Facebook campaigns identified in this tab. (3) Test new Facebook creatives on a small budget before scaling. (4) Double down on top-performing Google campaigns showing >1.5x ROI. (5) Investigate whether the Passover / Easter holiday window is suppressing conversions.` },
   ];
