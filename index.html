@@ -1755,6 +1755,8 @@ function buildAprRecs() {
 //  MEDIA MIX OPTIMIZER TAB
 // ══════════════════════════════════════════
 const MIX_COLORS = ['#6366f1','#10b981','#f59e0b','#a855f7','#06b6d4','#ec4899','#ef4444','#818cf8'];
+const MIX_CH_COLOR = { 'Facebook':'#6366f1', 'No Media':'#10b981', 'Email':'#f59e0b', 'Google':'#a855f7', 'PPC Other':'#06b6d4', 'Affiliates':'#ec4899', 'Community':'#ef4444', 'Web Campaign':'#818cf8' };
+function chColors(channels) { return channels.map(c => MIX_CH_COLOR[c.name] || '#555'); }
 
 function setMixView(view, btn) {
   mixView = view;
@@ -1849,7 +1851,7 @@ function buildMixCurrentDonut() {
     type: 'doughnut',
     data: {
       labels: ch.map(c => c.name),
-      datasets: [{ data: ch.map(c => c.leads), backgroundColor: MIX_COLORS, borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
+      datasets: [{ data: ch.map(c => c.leads), backgroundColor: chColors(ch), borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '58%',
@@ -1874,7 +1876,7 @@ function buildMixTargetDonut() {
     type: 'doughnut',
     data: {
       labels: ch.map(c => c.name),
-      datasets: [{ data: ch.map(c => c.leads), backgroundColor: MIX_COLORS, borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
+      datasets: [{ data: ch.map(c => c.leads), backgroundColor: chColors(ch), borderWidth: 2, borderColor: '#1c1c25', hoverOffset: 6 }]
     },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '58%',
@@ -1895,7 +1897,7 @@ function buildMixEffChart() {
     data: {
       labels: E.labels,
       datasets: [
-        { label: 'Revenue / Lead', data: E.rev_per_lead, backgroundColor: MIX_COLORS.map(c => c + 'cc'), borderRadius: 8, borderWidth: 0, order: 1 },
+        { label: 'Revenue / Lead', data: E.rev_per_lead, backgroundColor: E.labels.map(l => (MIX_CH_COLOR[l] || '#555') + 'cc'), borderRadius: 8, borderWidth: 0, order: 1 },
         { label: 'Profit / Lead', data: E.profit_per_lead, backgroundColor: E.profit_per_lead.map(v => v >= 0 ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'), borderRadius: 8, borderWidth: 0, order: 2 }
       ]
     },
