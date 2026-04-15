@@ -522,7 +522,7 @@
   <div class="section-header">
     <div class="school-badge all"><div class="school-dot" style="background:#ef4444"></div>Performance Alert</div>
     <div class="section-title">April 2026 Deep-Dive — Facebook &amp; Google</div>
-    <div class="section-sub">Diagnosing underperformance · Campaign-level analysis · Apr 1–12 comparable window</div>
+    <div class="section-sub">Diagnosing underperformance · Campaign-level analysis · Apr 1–14 comparable window</div>
   </div>
 
   <!-- YoY KPI row -->
@@ -532,7 +532,7 @@
   <div class="chart-grid chart-grid-2" style="margin-bottom:24px">
     <div class="chart-card">
       <div class="chart-card-header"><div>
-        <div class="chart-card-title">Year-over-Year: April 1–12</div>
+        <div class="chart-card-title">Year-over-Year: April 1–14</div>
         <div class="chart-card-sub">Comparable 12-day window across 2024, 2025, 2026</div>
       </div></div>
       <div class="chart-wrap" style="height:280px"><canvas id="aprYoyChart"></canvas></div>
@@ -1470,9 +1470,10 @@ function setAprView(view, btn) {
 function buildApril() {
   if (!APRIL) return;
   const A = APRIL;
-  const y26 = A.yoy_compare.apr2026_12d;
-  const y25 = A.yoy_compare.apr2025_12d;
-  const y24 = A.yoy_compare.apr2024_12d;
+  const yoyKeys = Object.keys(A.yoy_compare).sort();
+  const y24 = A.yoy_compare[yoyKeys.find(k=>k.startsWith('apr2024'))] || {};
+  const y25 = A.yoy_compare[yoyKeys.find(k=>k.startsWith('apr2025'))] || {};
+  const y26 = A.yoy_compare[yoyKeys.find(k=>k.startsWith('apr2026'))] || {};
 
   // ─ KPI cards
   const yoyRevPct = y25.revenue ? ((y26.revenue - y25.revenue) / y25.revenue * 100) : 0;
@@ -1661,9 +1662,10 @@ function buildAprCampTable() {
 
 function buildAprInsights() {
   const A = APRIL;
-  const y26 = A.yoy_compare.apr2026_12d;
-  const y25 = A.yoy_compare.apr2025_12d;
-  const y24 = A.yoy_compare.apr2024_12d;
+  const yoyKeys2 = Object.keys(A.yoy_compare).sort();
+  const y24 = A.yoy_compare[yoyKeys2.find(k=>k.startsWith('apr2024'))] || {};
+  const y25 = A.yoy_compare[yoyKeys2.find(k=>k.startsWith('apr2025'))] || {};
+  const y26 = A.yoy_compare[yoyKeys2.find(k=>k.startsWith('apr2026'))] || {};
   const fb = A.media_apr26.Facebook || {};
   const gg = A.media_apr26.Google || {};
 
@@ -1781,21 +1783,26 @@ function buildMix() {
 }
 
 function buildMixBanner() {
-  const K = MIX.key_findings;
   const cur = MIX.current_mix;
   const opt = MIX.optimal_mix;
   const fbCh = cur.channels.find(c => c.name === 'Facebook') || {};
-  const profitUplift = opt.total_profit - cur.total_profit;
+  const fbLoss = Math.abs((fbCh.cost||0) - (fbCh.revenue||0));
+  const curProfit = cur.total_revenue - cur.total_cost;
+  const optProfit = opt.total_revenue - opt.total_cost;
+  const profitUplift = optProfit - curProfit;
   const revUplift = opt.total_revenue - cur.total_revenue;
+  const revLiftPct = (revUplift / cur.total_revenue * 100).toFixed(1);
+  const profitLiftPct = (profitUplift / curProfit * 100).toFixed(1);
+  const fbRoi = fbCh.cost > 0 ? (fbCh.revenue / fbCh.cost).toFixed(2) : '0';
   document.getElementById('mixBanner').innerHTML = `
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
       <div style="flex:1;min-width:280px">
-        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Facebook loses ${fmt.$(Math.abs(fbCh.profit||0))}/month. Fixing this unlocks +${fmt.$(profitUplift)} in monthly profit.</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">Facebook absorbs ${fbCh.pct||0}% of leads but produces <strong style="color:#ef4444">negative profit</strong> (${fmt.$(fbCh.profit||0)}/month at 0.82x ROI). Both paid channels show strong diminishing returns — more volume means worse economics. The optimal mix cuts Facebook by 30%, scales Google by 55%, and grows organic channels to achieve <strong style="color:var(--green2)">+${K.optimal_vs_current_rev_lift}% revenue</strong> and <strong style="color:var(--green2)">+${K.optimal_vs_current_profit_lift}% profit</strong> vs. current.</div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Facebook loses ${fmt.$(fbLoss)}/month. Fixing this unlocks +${fmt.$(profitUplift)} in monthly profit.</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">Facebook absorbs ${fbCh.share||0}% of leads but produces <strong style="color:#ef4444">negative profit</strong> ($-${fmt.$(fbLoss)}/month at ${fbRoi}x ROI). Both paid channels show strong diminishing returns — more volume means worse economics. The optimal mix cuts Facebook by 30%, scales Google by 55%, and grows organic channels to achieve <strong style="color:var(--green2)">+${revLiftPct}% revenue</strong> and <strong style="color:var(--green2)">+${profitLiftPct}% profit</strong> vs. current.</div>
       </div>
       <div style="display:flex;gap:16px;flex-wrap:wrap">
         <div style="text-align:center;padding:14px 20px;background:rgba(239,68,68,0.08);border-radius:12px;border:1px solid rgba(239,68,68,0.15)">
-          <div style="font-size:24px;font-weight:800;color:#ef4444">${fmt.$(fbCh.profit||0)}</div>
+          <div style="font-size:24px;font-weight:800;color:#ef4444">$-${fmt.$(fbLoss)}</div>
           <div style="font-size:11px;color:var(--text2);margin-top:2px">FB monthly loss</div>
         </div>
         <div style="text-align:center;padding:14px 20px;background:rgba(16,185,129,0.08);border-radius:12px;border:1px solid rgba(16,185,129,0.15)">
@@ -1837,7 +1844,7 @@ function buildMixKpis() {
     <div class="kpi-card accent"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">${fmt.$(m.total_revenue)}</div><div class="kpi-sub"><span style="color:${revColor}">${revDelta > 0 ? '+' : ''}${revDelta}% vs current</span></div></div>
     <div class="kpi-card green"><div class="kpi-label">Monthly Profit</div><div class="kpi-value">${fmt.$(m.total_profit)}</div><div class="kpi-sub"><span style="color:${profColor}">${profDelta > 0 ? '+' : ''}${profDelta}% vs current</span></div></div>
     <div class="kpi-card amber"><div class="kpi-label">Portfolio ROI</div><div class="kpi-value">${m.roi.toFixed(2)}x</div><div class="kpi-sub">Current: ${c.roi.toFixed(2)}x</div></div>
-    <div class="kpi-card teal"><div class="kpi-label">Rev per Lead</div><div class="kpi-value">$${m.blended_rpl.toFixed(0)}</div><div class="kpi-sub">Current: $${c.blended_rpl.toFixed(0)}</div></div>
+    <div class="kpi-card teal"><div class="kpi-label">Rev per Lead</div><div class="kpi-value">$${(m.rpl||0).toFixed(0)}</div><div class="kpi-sub">Current: $${(c.rpl||0).toFixed(0)}</div></div>
     <div class="kpi-card blue"><div class="kpi-label">Monthly Leads</div><div class="kpi-value">${m.total_leads.toLocaleString()}</div><div class="kpi-sub">Current: ${c.total_leads.toLocaleString()}</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Monthly Ad Spend</div><div class="kpi-value">${fmt.$(m.total_cost)}</div><div class="kpi-sub">${costDelta > 0 ? '+' : ''}${costDelta}% vs current</div></div>
   `;
@@ -1890,7 +1897,7 @@ function buildMixTargetDonut() {
 
 function buildMixEffChart() {
   dc('mixEff');
-  const E = MIX.channel_efficiency;
+  const E = MIX.channel_efficiency || MIX.efficiency;
   const ctx = document.getElementById('mixEffChart').getContext('2d');
   charts['mixEff'] = new Chart(ctx, {
     type: 'bar',
@@ -1996,7 +2003,7 @@ function buildMixTable() {
       <td>${m.total_leads.toLocaleString()}</td>
       <td>100%</td>
       <td>${m.total_leads - c.total_leads > 0 ? '+' : ''}${(m.total_leads - c.total_leads).toLocaleString()}</td>
-      <td>$${m.blended_rpl.toFixed(0)}</td>
+      <td>$${(m.rpl||0).toFixed(0)}</td>
       <td style="color:var(--text)">${fmt.$(m.total_revenue)}</td>
       <td>${fmt.$(m.total_cost)}</td>
       <td style="color:${totalProfColor}">${fmt.$(m.total_profit)}</td>
