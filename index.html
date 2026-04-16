@@ -379,6 +379,9 @@
     </div>
   </div>
 
+  <!-- ── Key Insights & Recommendations ── -->
+  <div id="overviewInsights" style="margin-bottom:24px"></div>
+
   <div class="chart-grid chart-grid-full">
     <div class="chart-card">
       <div class="chart-card-header"><div><div class="chart-card-title">Revenue vs. ROI — Top 40 Campaigns</div><div class="chart-card-sub">Bubble size = orders · Min spend $10K included</div></div></div>
@@ -1084,6 +1087,7 @@ function buildOverview() {
   buildTrendChart();
   buildMediaChart();
   buildCountryChartOverview();
+  buildOverviewInsights();
   buildScatterChart();
 }
 
@@ -1149,6 +1153,179 @@ function buildCountryChartOverview() {
       plugins:{ legend:{display:true,position:'right',labels:{color:'#9999b0',font:{size:11},padding:12,usePointStyle:true,pointStyle:'circle'}}, tooltip:{...TT,callbacks:{label:c=>` ${fmt.$(c.parsed)}`}} }
     }
   });
+}
+
+// ── Overview Insights & Recommendations ──
+function buildOverviewInsights() {
+  const S = DATA.summary_v2;
+  const o = S.overall, h = S.hebrew, b = S.biblical;
+  const T = DATA.trend;
+  const media = [...(DATA.media.hebrew||[]), ...(DATA.media.biblical||[])];
+
+  // Aggregate media across schools
+  const mMap = {};
+  media.forEach(m => {
+    if (!mMap[m.Media]) mMap[m.Media] = { Media: m.Media, Revenue: 0, Cost: 0 };
+    mMap[m.Media].Revenue += m.Revenue;
+    mMap[m.Media].Cost += m.Cost;
+  });
+  const mArr = Object.values(mMap).map(m => ({
+    ...m, ROI: m.Cost > 0 ? m.Revenue / m.Cost : 0,
+    Profit: m.Revenue - m.Cost,
+    isPaid: m.Cost > 0
+  })).sort((a,b) => b.Revenue - a.Revenue);
+
+  // ── Compute insights ──
+  const insights = [];
+  const recs = [];
+
+  // 1. Trend direction (last 3 months vs first 3 in range)
+  const nM = T.months.length;
+  if (nM >= 6) {
+    const last3Rev = T.months.slice(-3).reduce((s,_,i) => s + (T.hebrew_revenue[nM-3+i]||0) + (T.biblical_revenue[nM-3+i]||0), 0);
+    const first3Rev = T.months.slice(0,3).reduce((s,_,i) => s + (T.hebrew_revenue[i]||0) + (T.biblical_revenue[i]||0), 0);
+    const trendPct = first3Rev > 0 ? ((last3Rev / first3Rev - 1) * 100) : 0;
+    const last3ROI = T.months.slice(-3).reduce((s,_,i) => {
+      const hr = T.hebrew_revenue[nM-3+i]||0, br = T.biblical_revenue[nM-3+i]||0;
+      const hRoi = T.hebrew_roi[nM-3+i]||0, bRoi = T.biblical_roi[nM-3+i]||0;
+      const hC = hRoi > 0 ? hr/hRoi : 0, bC = bRoi > 0 ? br/bRoi : 0;
+      return { r: s.r+hr+br, c: s.c+hC+bC };
+    }, {r:0,c:0});
+    const recent3ROI = last3ROI.c > 0 ? last3ROI.r / last3ROI.c : 0;
+    if (trendPct < -10) {
+      insights.push({ icon: '⚠', color: '#ef4444', title: 'Revenue Declining', text: `Last 3 months revenue is ${Math.abs(trendPct).toFixed(0)}% lower than the first 3 months in this range. Recent ROI: ${recent3ROI.toFixed(2)}x.` });
+    } else if (trendPct > 10) {
+      insights.push({ icon: '▲', color: '#10b981', title: 'Revenue Growing', text: `Last 3 months revenue is +${trendPct.toFixed(0)}% vs the first 3 months. Momentum is positive.` });
+    } else {
+      insights.push({ icon: '●', color: '#f59e0b', title: 'Revenue Stable', text: `Revenue is relatively flat (${trendPct > 0 ? '+' : ''}${trendPct.toFixed(0)}%) between the first and last 3 months in this range.` });
+    }
+  }
+
+  // 2. Channel efficiency
+  const paid = mArr.filter(m => m.isPaid);
+  const organic = mArr.filter(m => !m.isPaid && m.Revenue > 0).sort((a,b) => b.Revenue - a.Revenue);
+  const losing = paid.filter(m => m.ROI < 1.0);
+  const profitable = paid.filter(m => m.ROI >= 1.0);
+
+  if (losing.length > 0) {
+    const totalLoss = losing.reduce((s,m) => s + Math.abs(m.Profit), 0);
+    insights.push({ icon: '⚠', color: '#ef4444', title: `${losing.length} Paid Channel${losing.length>1?'s':''} Below Breakeven`,
+      text: `${losing.map(m => m.Media + ' (' + m.ROI.toFixed(2) + 'x)').join(', ')} ${losing.length>1?'are':'is'} producing negative returns. Combined loss: ${fmt.$(totalLoss)}.` });
+    recs.push({ priority: 'high', text: `Reduce spend on ${losing.map(m=>m.Media).join(' and ')} — reallocate budget to channels with positive ROI.` });
+  }
+  if (profitable.length > 0) {
+    const best = profitable.sort((a,b) => b.ROI - a.ROI)[0];
+    insights.push({ icon: '✓', color: '#10b981', title: `${best.Media} — Strongest Paid ROI`,
+      text: `${best.ROI.toFixed(2)}x return on ad spend with ${fmt.$(best.Revenue)} revenue from ${fmt.$(best.Cost)} investment.` });
+  }
+  if (organic.length > 0) {
+    const topOrg = organic[0];
+    const orgTotal = organic.reduce((s,m) => s + m.Revenue, 0);
+    const orgPct = o.revenue > 0 ? (orgTotal / o.revenue * 100).toFixed(0) : 0;
+    insights.push({ icon: '●', color: '#06b6d4', title: `Organic Channels: ${orgPct}% of Revenue`,
+      text: `${organic.slice(0,3).map(m=>m.Media).join(', ')} generate revenue at zero cost. Top performer: ${topOrg.Media} (${fmt.$(topOrg.Revenue)}).` });
+    if (orgPct < 40) recs.push({ priority: 'medium', text: `Organic channels contribute only ${orgPct}% of revenue. Invest in growing No Media, Email, and Community to reduce paid dependency.` });
+  }
+
+  // 3. School comparison
+  if (h.leads > 0 && b.leads > 0) {
+    const hRPL = h.revenue / h.leads, bRPL = b.revenue / b.leads;
+    const hConv = h.orders / h.leads * 100, bConv = b.orders / b.leads * 100;
+    const hAcq = h.acquisitions / h.leads * 100, bAcq = b.acquisitions / b.leads * 100;
+    const better = hRPL > bRPL ? 'Hebrew' : 'Biblical';
+    const ratio = Math.max(hRPL, bRPL) / Math.min(hRPL, bRPL);
+    insights.push({ icon: '◆', color: '#a855f7', title: `${better} School — ${ratio.toFixed(1)}x Higher Rev/Lead`,
+      text: `Hebrew: $${hRPL.toFixed(0)}/lead, ${hConv.toFixed(1)}% order rate, ${hAcq.toFixed(1)}% acquisition rate. Biblical: $${bRPL.toFixed(0)}/lead, ${bConv.toFixed(1)}% order rate, ${bAcq.toFixed(1)}% acquisition rate.` });
+    if (ratio > 1.5) {
+      const weaker = better === 'Hebrew' ? 'Biblical' : 'Hebrew';
+      recs.push({ priority: 'medium', text: `${weaker} School has significantly lower revenue per lead. Investigate lead quality, course pricing, or funnel conversion gaps.` });
+    }
+  }
+
+  // 4. Conversion insight
+  if (o.leads > 0) {
+    const convRate = o.orders / o.leads * 100;
+    const acqRate = o.acquisitions / o.leads * 100;
+    if (convRate < 6) {
+      insights.push({ icon: '⚠', color: '#f59e0b', title: `Lead-to-Order: ${convRate.toFixed(1)}%`, text: `Only ${convRate.toFixed(1)}% of leads convert to orders. Improving conversion by even 1 percentage point could add significant revenue.` });
+      recs.push({ priority: 'high', text: `Focus on lead qualification and nurture sequences to improve the ${convRate.toFixed(1)}% conversion rate. Small improvements here have outsized revenue impact.` });
+    } else {
+      insights.push({ icon: '✓', color: '#10b981', title: `Lead-to-Order: ${convRate.toFixed(1)}%`, text: `${convRate.toFixed(1)}% order rate and ${acqRate.toFixed(1)}% acquisition rate across ${o.leads.toLocaleString()} leads.` });
+    }
+  }
+
+  // 5. Best day of week (from daily data)
+  const daily = RAW.daily.filter(r => {
+    const d1 = dateStart || RAW.meta.minDate, d2 = dateEnd || RAW.meta.maxDate;
+    return r.d >= d1 && r.d <= d2;
+  });
+  const dowMap = {};
+  const dowNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  daily.forEach(r => {
+    const dow = new Date(r.d + 'T00:00:00').getDay();
+    if (!dowMap[dow]) dowMap[dow] = { rev: 0, leads: 0, orders: 0, days: new Set() };
+    dowMap[dow].rev += r.r; dowMap[dow].leads += r.l; dowMap[dow].orders += r.o;
+    dowMap[dow].days.add(r.d);
+  });
+  const dowArr = Object.entries(dowMap).map(([d,v]) => ({
+    day: dowNames[d], revPerDay: v.days.size > 0 ? v.rev / v.days.size : 0,
+    conv: v.leads > 0 ? v.orders / v.leads * 100 : 0
+  })).sort((a,b) => b.revPerDay - a.revPerDay);
+  if (dowArr.length >= 5) {
+    const best = dowArr[0], worst = dowArr[dowArr.length - 1];
+    const ratio2 = best.revPerDay / worst.revPerDay;
+    if (ratio2 > 1.3) {
+      recs.push({ priority: 'low', text: `${best.day} generates ${ratio2.toFixed(1)}x more daily revenue than ${worst.day}. Consider concentrating ad budget on high-performing days.` });
+    }
+  }
+
+  // ── Render ──
+  const el = document.getElementById('overviewInsights');
+  if (!el) return;
+
+  const insightsHTML = insights.map(i => `
+    <div style="display:flex;gap:14px;align-items:flex-start;padding:16px 20px;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid rgba(255,255,255,0.04)">
+      <div style="width:32px;height:32px;border-radius:8px;background:${i.color}15;display:flex;align-items:center;justify-content:center;font-size:14px;color:${i.color};flex-shrink:0;border:1px solid ${i.color}30">${i.icon}</div>
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:700;color:${i.color};margin-bottom:3px">${i.title}</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">${i.text}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const highRecs = recs.filter(r => r.priority === 'high');
+  const medRecs = recs.filter(r => r.priority === 'medium');
+  const lowRecs = recs.filter(r => r.priority === 'low');
+  const allRecs = [...highRecs, ...medRecs, ...lowRecs];
+
+  const prioLabel = { high: 'High Priority', medium: 'Medium Priority', low: 'Optimization' };
+  const prioColor = { high: '#ef4444', medium: '#f59e0b', low: '#06b6d4' };
+
+  const recsHTML = allRecs.map(r => `
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 16px;background:rgba(255,255,255,0.02);border-radius:10px;border-left:3px solid ${prioColor[r.priority]}">
+      <span style="font-size:10px;font-weight:700;text-transform:uppercase;color:${prioColor[r.priority]};white-space:nowrap;padding-top:2px;letter-spacing:0.5px">${prioLabel[r.priority]}</span>
+      <span style="font-size:12px;color:var(--text2);line-height:1.6">${r.text}</span>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="chart-card" style="padding:0">
+        <div style="padding:20px 24px 14px">
+          <div class="chart-card-title">Key Insights</div>
+          <div class="chart-card-sub">Auto-generated from filtered data</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:0 20px 20px">${insightsHTML || '<div style="color:var(--text2);font-size:13px;padding:8px">Not enough data for insights.</div>'}</div>
+      </div>
+      <div class="chart-card" style="padding:0">
+        <div style="padding:20px 24px 14px">
+          <div class="chart-card-title">Recommendations</div>
+          <div class="chart-card-sub">Actionable next steps based on current performance</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:0 20px 20px">${recsHTML || '<div style="color:var(--text2);font-size:13px;padding:8px">No recommendations for this date range.</div>'}</div>
+      </div>
+    </div>
+  `;
 }
 
 // ── Scatter ──
