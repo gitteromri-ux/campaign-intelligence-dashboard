@@ -1846,15 +1846,23 @@ function buildAprInsights() {
   const fb = A.media_apr26.Facebook || {};
   const gg = A.media_apr26.Google || {};
 
-  const fbCostShare = fb.cost / (fb.cost + gg.cost) * 100;
-  const fbRevShare  = fb.revenue / ((fb.revenue||0) + (gg.revenue||0)) * 100;
+  // Derive the day count from the YoY key (e.g. 'apr2026_15d' -> 15)
+  const dayKey = yoyKeys2.find(k=>k.startsWith('apr2026')) || '';
+  const maxDay = parseInt(dayKey.replace(/[^0-9]/g,'').slice(4)) || '?';
+
+  const totalCost = (fb.cost||0) + (gg.cost||0);
+  const totalRev = (fb.revenue||0) + (gg.revenue||0);
+  const fbCostShare = totalCost > 0 ? fb.cost / totalCost * 100 : 0;
+  const fbRevShare  = totalRev > 0 ? fb.revenue / totalRev * 100 : 0;
+  const lossPerDollar = y26.roi < 1 ? (1 - y26.roi).toFixed(2) : 0;
+  const yoyDet24 = y24.roi > 0 ? ((y26.roi / y24.roi - 1) * 100).toFixed(0) : 0;
 
   const insights = [
-    { icon:'🚨', text:`<strong>April 2026 ROI is 0.66x — losing $0.34 on every dollar spent.</strong> Revenue is $69K against $105K in ad spend (Apr 1–13). This is a 28% deterioration vs. 2024 (0.92x) for the same window. The bleed is real and accelerating.` },
-    { icon:'📱', text:`<strong>Facebook is the primary drag: ROI 0.51x</strong> — spending $83.7K to generate only $43K in revenue. Facebook absorbs ${fbCostShare.toFixed(0)}% of budget but delivers only ${fbRevShare.toFixed(0)}% of revenue. Every $1 on Facebook returns $0.51.` },
-    { icon:'✅', text:`<strong>Google is profitable at 1.24x ROI</strong> — $21K spend producing $26K revenue. Google has a much higher lead-to-order rate (${((gg.leadToOrder||0)*100).toFixed(1)}% vs Facebook's ${((fb.leadToOrder||0)*100).toFixed(1)}%) despite higher CPL ($${(gg.cpl||0).toFixed(0)} vs $${(fb.cpl||0).toFixed(0)}). Google leads convert better.` },
+    { icon:'🚨', text:`<strong>April 2026 ROI is ${(y26.roi||0).toFixed(2)}x — losing $${lossPerDollar} on every dollar spent.</strong> Revenue is ${fmt.$(y26.revenue||0)} against ${fmt.$(y26.cost||0)} in ad spend (Apr 1–${maxDay}). This is a ${Math.abs(yoyDet24)}% deterioration vs. 2024 (${(y24.roi||0).toFixed(2)}x) for the same window.` },
+    { icon:'📱', text:`<strong>Facebook is the primary drag: ROI ${(fb.roi||0).toFixed(2)}x</strong> — spending ${fmt.$(fb.cost||0)} to generate only ${fmt.$(fb.revenue||0)} in revenue. Facebook absorbs ${fbCostShare.toFixed(0)}% of budget but delivers only ${fbRevShare.toFixed(0)}% of revenue. Every $1 on Facebook returns $${(fb.roi||0).toFixed(2)}.` },
+    { icon:'✅', text:`<strong>Google is ${(gg.roi||0) >= 1 ? 'profitable' : 'underperforming'} at ${(gg.roi||0).toFixed(2)}x ROI</strong> — ${fmt.$(gg.cost||0)} spend producing ${fmt.$(gg.revenue||0)} revenue. Google has a much higher lead-to-order rate (${((gg.leadToOrder||0)*100).toFixed(1)}% vs Facebook's ${((fb.leadToOrder||0)*100).toFixed(1)}%) despite higher CPL ($${(gg.cpl||0).toFixed(0)} vs $${(fb.cpl||0).toFixed(0)}). Google leads convert better.` },
     { icon:'💰', text:`<strong>Facebook CPL looks cheap ($${(fb.cpl||0).toFixed(0)}) but produces low-quality leads.</strong> Facebook generates ${(fb.leads||0).toLocaleString()} leads vs Google's ${(gg.leads||0).toLocaleString()}, but the conversion to orders is dramatically worse. Volume without quality is pure cost.` },
-    { icon:'📉', text:`<strong>Year-over-year decline is structural, not seasonal.</strong> Apr 2024: $94K revenue / 0.92x ROI → Apr 2025: $58K / 0.55x → Apr 2026: $69K / 0.66x. Revenue improved slightly from the 2025 trough but ROI remains far below breakeven. The cost base has grown faster than revenue.` },
+    { icon:'📉', text:`<strong>Year-over-year decline is structural, not seasonal.</strong> Apr 2024: ${fmt.$(y24.revenue||0)} revenue / ${(y24.roi||0).toFixed(2)}x ROI → Apr 2025: ${fmt.$(y25.revenue||0)} / ${(y25.roi||0).toFixed(2)}x → Apr 2026: ${fmt.$(y26.revenue||0)} / ${(y26.roi||0).toFixed(2)}x. ${y26.revenue > y25.revenue ? 'Revenue improved slightly from the 2025 trough but' : 'Revenue continues to decline and'} ROI remains far below breakeven.` },
     { icon:'🛠', text:`<strong>Recommended actions:</strong> (1) Cut Facebook daily budget by 30–40% immediately — redirect to Google. (2) Pause all zero-revenue Facebook campaigns identified in this tab. (3) Test new Facebook creatives on a small budget before scaling. (4) Double down on top-performing Google campaigns showing >1.5x ROI. (5) Investigate whether the Passover / Easter holiday window is suppressing conversions.` },
   ];
 
